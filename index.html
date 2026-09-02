@@ -1,0 +1,3316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Campus Guardian Angel — Incident Supplemental Report</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f4f5f7;
+    --bg-tertiary: #e9ebef;
+    --text-primary: #15181e;
+    --text-secondary: #596273;
+    --text-tertiary: #9aa1ad;
+    --border-light: rgba(21,24,30,0.08);
+    --border-medium: rgba(21,24,30,0.16);
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 14px;
+    --brand: #15181e;
+    --accent: #3b6ef5;
+    --accent-strong: #2f5ad4;
+    --accent-soft: #e8effe;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg-secondary); color: var(--text-primary); min-height: 100vh; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── Login page ── */
+  .login-wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+  .login-card { width: 100%; max-width: 480px; background: var(--bg-primary); border-radius: var(--radius-lg); box-shadow: 0 1px 3px rgba(21,24,30,0.06); overflow: hidden; }
+  .login-card-body { padding: 40px 40px 32px; }
+  .login-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 28px; }
+  .login-brand-logo { width: 32px; height: 32px; border-radius: 50%; background: var(--brand); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; flex-shrink: 0; }
+  .login-brand-name { font-size: 17px; font-weight: 600; }
+  .login-title { font-size: 26px; font-weight: 700; text-align: center; margin-bottom: 28px; }
+  .login-field { margin-bottom: 18px; }
+  .login-field label { display: block; font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 6px; }
+  .login-input-wrap { position: relative; }
+  .login-input { width: 100%; padding: 11px 14px; font-size: 14px; border: 0.5px solid var(--border-medium); border-radius: var(--radius-sm); font-family: inherit; color: var(--text-primary); }
+  .login-input:focus { outline: none; border-color: var(--accent); }
+  .login-eye-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-tertiary); font-size: 17px; display: flex; }
+  .login-forgot { font-size: 13px; font-weight: 600; color: var(--text-primary); text-decoration: none; cursor: default; display: inline-block; margin-top: 2px; }
+  .login-card-footer { border-top: 0.5px solid var(--border-light); padding: 20px 40px; display: flex; justify-content: flex-end; }
+  .btn-primary { background: var(--brand); color: #fff; border: none; padding: 11px 24px; font-size: 14px; font-weight: 600; border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .login-page-footer { margin-top: 28px; text-align: center; }
+  .login-page-footer .links { display: flex; gap: 20px; justify-content: center; margin-bottom: 8px; }
+  .login-page-footer a { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-decoration: none; cursor: default; }
+  .login-page-footer .copyright { font-size: 13px; color: var(--text-secondary); }
+  .field-error { font-size: 12px; color: #b91c1c; margin-top: 6px; display: none; }
+  .field-error.show { display: block; }
+
+  /* ── Form page ── */
+  .form-wrap { max-width: 1200px; margin: 0 auto; padding: 40px 24px 80px; }
+  .form-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; gap: 12px; }
+  .form-brand { display: flex; align-items: center; gap: 10px; justify-content: center; }
+  .form-header .login-brand-logo { width: 28px; height: 28px; font-size: 14px; }
+  .form-brand-name { font-size: 15px; font-weight: 600; }
+  .member-switcher-row { width: 100%; display: flex; justify-content: center; }
+  .member-switcher select { font-size: 13px; padding: 7px 11px; border: 0.5px solid var(--border-medium); border-radius: var(--radius-sm); background: var(--bg-primary); color: var(--text-primary); font-family: inherit; cursor: pointer; }
+  .back-btn { display: inline-flex; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 13px; font-weight: 500; font-family: inherit; padding: 9px 12px; border-radius: var(--radius-sm); }
+  .back-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .form-page-title { font-size: 15px; font-weight: 600; margin-bottom: 20px; text-align: center; }
+  .form-card { background: var(--bg-primary); border-radius: var(--radius-lg); border: 0.5px solid var(--border-light); overflow: hidden; }
+
+  /* ── Top card: Incident/Your info (left) + Screen recording (right) ── */
+  .top-info-grid { display: grid; grid-template-columns: 2fr 3fr; align-items: stretch; }
+  .top-info-main { min-width: 0; }
+  .top-info-recording { padding: 24px 28px; border-left: 0.5px solid var(--border-light); }
+
+  /* ── form-columns: single full-width column (recording panel moved to the top card) ── */
+  .form-columns { display: block; }
+  .form-column-main { min-width: 0; }
+  .recording-subtext { font-size: 12px; color: var(--text-tertiary); margin: -6px 0 12px; }
+  .recording-frame { position: relative; width: 100%; aspect-ratio: 16 / 10; background: linear-gradient(155deg, #2A2A32, #16161B); border-radius: var(--radius-lg); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .recording-play-btn { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.75); font-size: 20px; cursor: not-allowed; }
+  .recording-caption { position: absolute; left: 14px; right: 14px; bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .recording-caption-name { background: rgba(0,0,0,0.55); color: #fff; font-size: 12px; font-weight: 500; padding: 5px 10px; border-radius: var(--radius-sm); }
+  .recording-duration-chip { background: rgba(0,0,0,0.55); color: rgba(255,255,255,0.85); font-size: 11px; padding: 5px 8px; border-radius: var(--radius-sm); }
+  .recording-help-text { font-size: 12px; color: var(--text-tertiary); margin-top: 10px; line-height: 1.5; }
+
+  @media (max-width: 860px) {
+    .top-info-grid { grid-template-columns: 1fr; }
+    .top-info-recording { border-left: none; border-top: 0.5px solid var(--border-light); }
+  }
+  .form-section { padding: 24px 28px; border-bottom: 0.5px solid var(--border-light); }
+  .form-section:last-child { border-bottom: none; }
+  .form-section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-tertiary); margin-bottom: 16px; }
+  .form-section-title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  .form-section-title-row .form-section-title { margin-bottom: 0; }
+  .confirm-checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
+  .confirm-checkbox-row input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
+  .confirm-checkbox-row input[type="checkbox"]:disabled { cursor: not-allowed; }
+  .confirm-checkbox-row input[type="checkbox"]:disabled ~ span { opacity: 0.6; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+  .form-field label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+  .form-field .ro-value { font-size: 14px; color: var(--text-primary); font-weight: 500; }
+  .form-field textarea { width: 100%; min-height: 110px; padding: 10px 12px; font-size: 14px; font-family: inherit; border: 0.5px solid var(--border-medium); border-radius: var(--radius-sm); resize: vertical; color: var(--text-primary); }
+  .form-field textarea:focus { outline: none; border-color: var(--accent); }
+  .form-field textarea:disabled { background: var(--bg-secondary); color: var(--text-secondary); }
+  .field-row-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .btn-secondary { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; font-size: 13px; font-weight: 500; border: 0.5px solid var(--border-medium); border-radius: var(--radius-sm); background: var(--bg-primary); color: var(--text-primary); cursor: pointer; font-family: inherit; }
+  .btn-secondary:hover { background: var(--bg-secondary); }
+  .btn-secondary:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-secondary.active { background: var(--text-primary); color: #fff; border-color: var(--text-primary); }
+  .saved-indicator { font-size: 12px; color: #1E7B34; display: inline-flex; align-items: center; gap: 4px; opacity: 0; transition: opacity 0.2s; }
+  .saved-indicator.show { opacity: 1; }
+  .file-chip { font-size: 12px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
+  .assigned-section-block { border: 0.5px solid var(--border-light); border-radius: var(--radius-md); padding: 16px; }
+  .assigned-section-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 4px; }
+
+  /* ── Step wizard: progress indicator + Back/Next navigation ── */
+  .step-progress { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 28px; border-bottom: 0.5px solid var(--border-light); }
+  .step-progress-name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+  .step-progress-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .step-progress-count { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
+  .step-progress-bar-track { width: 160px; height: 6px; border-radius: 999px; background: var(--bg-tertiary); overflow: hidden; }
+  .step-progress-bar-fill { height: 100%; border-radius: 999px; background: #4CAF50; transition: width 0.2s ease; }
+  .tab-panel-container { padding: 24px 28px; display: flex; flex-direction: column; gap: 24px; }
+  .assigned-section-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .assigned-section-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; }
+  .asset-action-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-medium); background: var(--bg-primary); color: var(--text-secondary); cursor: pointer; font-size: 14px; flex-shrink: 0; }
+  .asset-action-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .comment-actions-wrap { position: relative; flex-shrink: 0; }
+  .item-menu { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: var(--bg-primary); border: 0.5px solid var(--border-medium); border-radius: var(--radius-md); padding: 4px; min-width: 150px; z-index: 50; box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+  .item-menu.open { display: block; }
+  .item-menu-option { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; font-size: 13px; border: none; background: none; text-align: left; cursor: pointer; border-radius: var(--radius-sm); color: var(--text-primary); font-family: inherit; }
+  .item-menu-option:hover { background: var(--bg-secondary); }
+  .item-menu-option.danger { color: #b91c1c; }
+  .placeholder-section { padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px; background: var(--bg-secondary); border-radius: var(--radius-md); }
+  .review-note { background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; margin-top: 10px; }
+  .form-footer { padding: 20px 28px; display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--bg-secondary); }
+  .locked-banner { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: var(--accent-soft); color: var(--accent-strong); border-radius: var(--radius-md); font-size: 13px; font-weight: 500; margin-bottom: 20px; position: sticky; top: 24px; z-index: 20; }
+
+  /* ── Medical: Casualties fatality confirm-zero state (mirrors PIA Admin Panel) ── */
+  .cas-affirmed-note { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-primary); font-weight: 500; }
+  .cas-empty-attr { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+  .cas-category-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin: 18px 0 8px; }
+  .cas-category-title:first-child { margin-top: 0; }
+
+  /* ── Medical: Medical channel (read-only reference, ported summary of PIA's channel dashboard) ── */
+  .med-metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .med-metric-card { border: 0.5px solid var(--border-light); border-radius: var(--radius-md); padding: 12px 14px; }
+  .med-metric-num { display: block; font-size: 20px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+  .med-metric-label { display: block; font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .med-event-list { border: 0.5px solid var(--border-light); border-radius: var(--radius-md); overflow: hidden; }
+  .med-event-row { display: flex; gap: 12px; padding: 9px 14px; font-size: 13px; border-bottom: 0.5px solid var(--border-light); }
+  .med-event-row:last-child { border-bottom: none; }
+  .med-event-time { color: var(--text-tertiary); flex-shrink: 0; width: 92px; }
+  .med-event-text { color: var(--text-primary); }
+  .med-event-list-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin: 4px 0 8px; }
+
+  /* ── Supplemental report dropzone ── */
+  .supplemental-report-mode-intro { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+  .dropzone { border: 1.5px dashed var(--border-medium); border-radius: var(--radius-md); background: var(--bg-secondary); padding: 28px 20px; text-align: center; transition: border-color 0.15s, background 0.15s; }
+  .dropzone.dragover { border-color: var(--accent); background: var(--accent-soft); }
+  .dropzone-state { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .dropzone-icon { font-size: 26px; color: var(--text-tertiary); margin-bottom: 4px; }
+  .dropzone-icon.error { color: #b91c1c; }
+  .dropzone-main-text { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+  .dropzone-main-text.error { color: #b91c1c; font-weight: 500; }
+  .dropzone-support-text { font-size: 12px; color: var(--text-tertiary); margin-top: 6px; }
+  .upload-spinner { width: 22px; height: 22px; border: 2.5px solid var(--border-medium); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 4px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .uploaded-file-chip { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--bg-primary); border: 0.5px solid var(--border-medium); border-radius: var(--radius-sm); font-size: 13px; color: var(--text-primary); max-width: 380px; margin-bottom: 12px; }
+  .uploaded-file-chip i.ti-file-description { color: var(--text-tertiary); flex-shrink: 0; }
+  .uploaded-file-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+  .uploaded-file-size { color: var(--text-tertiary); font-size: 12px; flex-shrink: 0; }
+  .uploaded-file-remove { border: none; background: none; cursor: pointer; color: var(--text-tertiary); width: 24px; height: 24px; border-radius: var(--radius-sm); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .uploaded-file-remove:hover { background: var(--bg-tertiary); color: #b91c1c; }
+  .uploaded-file-remove:disabled { opacity: 0.45; cursor: not-allowed; }
+  #supplemental-report-file-list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+  #supplemental-report-file-list .uploaded-file-chip { max-width: none; margin-bottom: 0; }
+  .btn-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; border: none; background: none; color: var(--accent-strong); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; padding: 4px 2px; }
+  .btn-link:hover { text-decoration: underline; }
+  .btn-link:disabled { opacity: 0.45; cursor: not-allowed; text-decoration: none; }
+  .explainer-callout { display: flex; gap: 12px; padding: 14px 16px; background: var(--accent-soft); border-radius: var(--radius-md); font-size: 13px; color: var(--text-primary); line-height: 1.55; }
+  .explainer-callout i { color: var(--accent-strong); font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+  .explainer-callout p { margin-bottom: 8px; }
+  .explainer-callout p:last-child { margin-bottom: 0; }
+  .swap-toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text-primary); color: #fff; padding: 10px 18px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 3000; }
+  .swap-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Ported LE personnel table (matches Overview tab) ── */
+  .casualty-list-panel { border: 0.5px solid var(--border-light); border-radius: var(--radius-md); margin-top: 10px; overflow-x: auto; overflow-y: hidden; }
+  .cas-row2 { display: flex; align-items: center; gap: 16px; padding: 9px 14px; border-bottom: 0.5px solid var(--border-light); font-size: 13px; overflow: hidden; }
+  .cas-row2.cas-head { padding-top: 11px; padding-bottom: 11px; }
+  .cas-row2.cas-head span { font-size: 11px; font-weight: 500; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.03em; text-align: left; }
+  .cas-row2:hover .drone-edit-btn, .cas-row2:hover .cas-trash { opacity: 1; }
+  .cas-row2.removed .toc-c-name, .cas-row2.removed .toc-c-role, .cas-row2.removed .toc-c-conn, .cas-row2.removed .toc-c-left, .cas-row2.removed .dr-c-reached { text-decoration: line-through; color: var(--text-tertiary); }
+  .toc-c-name { flex: 1; min-width: 130px; font-weight: 500; color: var(--text-primary); }
+  .toc-c-role { width: 114px; flex-shrink: 0; color: var(--text-secondary); font-size: 12px; white-space: nowrap; }
+  .toc-c-conn { width: 80px; flex-shrink: 0; color: var(--text-secondary); font-size: 12px; }
+  .toc-c-left { width: 80px; flex-shrink: 0; color: var(--text-secondary); font-size: 12px; }
+  .dr-c-reached { width: 100px; flex-shrink: 0; color: var(--text-secondary); font-size: 12px; }
+  .cas-c-note { width: 126px; flex-shrink: 0; flex-grow: 0; font-size: 12px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+  .cas-c-note.open { white-space: normal; overflow: visible; }
+  .cas-c-actions { width: 100px; flex-shrink: 0; display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+  /* ── Casualties table columns (Medical) — same row shell as the LE table, own column set ── */
+  .cas-c-name { flex: 1; min-width: 130px; font-weight: 500; color: var(--text-primary); }
+  .cas-c-role { width: 114px; flex-shrink: 0; color: var(--text-secondary); font-size: 12px; white-space: nowrap; }
+  .cas-c-rec { width: 100px; flex-shrink: 0; color: var(--text-secondary); font-size: 12px; }
+  .cas-row2.removed .cas-c-name, .cas-row2.removed .cas-c-role, .cas-row2.removed .cas-c-rec { text-decoration: line-through; color: var(--text-tertiary); }
+  .cas-add-select { font-size: 13px; font-family: inherit; padding: 6px 9px; border: 0.5px solid var(--border-medium); border-radius: var(--radius-sm); color: var(--text-primary); background: var(--bg-primary); }
+  .cas-add-select:disabled { background: var(--bg-tertiary); color: var(--text-tertiary); cursor: not-allowed; }
+  .pt-controls { display: flex; align-items: center; gap: 10px; }
+  .row-marker { display: inline-flex; align-items: center; font-size: 9px; font-weight: 600; padding: 1px 6px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .row-marker.manual { color: var(--accent-strong); background: var(--accent-soft); }
+  .row-marker.removed-tag { color: var(--text-secondary); background: var(--bg-tertiary); }
+  .row-marker.battery { color: #B45309; background: #FEF3E2; }
+
+  /* ── Ported from Overview tab: tab-group switcher (Casualties/Response Assets/Communication) ── */
+  .tab-group { display: flex; border: 0.5px solid var(--border-medium); border-radius: var(--radius-md); overflow: hidden; width: fit-content; margin-bottom: 14px; }
+  .tab-btn { padding: 6px 18px; font-size: 13px; border: none; background: var(--bg-secondary); color: var(--text-secondary); cursor: pointer; font-family: inherit; }
+  .tab-btn.active { background: var(--bg-primary); color: var(--text-primary); font-weight: 500; }
+  .tab-btn + .tab-btn { border-left: 0.5px solid var(--border-medium); }
+
+  /* ── Ported from Overview tab: role filter dropdown (Casualties) ── */
+  .pt-role-select { border: 0.5px solid var(--border-medium); border-radius: var(--radius-sm); padding: 7px 11px; font-size: 13px; color: var(--text-primary); background: var(--bg-primary); cursor: pointer; font-family: inherit; }
+
+  /* ── Ported from Overview tab: expand chevron (Incident recap stage rows) ── */
+  .casualty-chevron { display: inline-block; transition: transform 0.15s; font-size: 13px; color: var(--text-tertiary); }
+  .casualty-chevron.open { transform: rotate(180deg); }
+
+  /* ── Ported from Overview tab: Incident recap stage bar/legend + wide "Changed by" column ── */
+  .recap-stage-bar { position: relative; height: 26px; margin-bottom: 12px; border-radius: 4px; overflow: hidden; background: var(--bg-secondary); }
+  .recap-stage-seg { position: absolute; top: 0; bottom: 0; }
+  .recap-stage-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 14px; }
+  .recap-stage-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .recap-stage-legend-dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; display: inline-block; }
+  .recap-c-by { width: 220px; flex-shrink: 0; color: var(--text-secondary); font-size: 12px; white-space: normal; }
+
+  /* ── Ported from Overview tab: Suspect information block (Incident recap) ── */
+  .stats-suspect-card { background: var(--bg-primary); border: 0.5px solid var(--border-medium); border-radius: var(--radius-md); padding: 14px 16px; margin-top: 4px; }
+  .stats-suspect-text { font-size: 13px; color: var(--text-primary); line-height: 1.6; margin-bottom: 8px; }
+  .stats-suspect-meta { font-size: 12px; color: var(--text-tertiary); }
+  .stats-suspect-current-tag { font-size: 10px; font-weight: 600; color: var(--accent-strong); background: var(--accent-soft); padding: 1px 7px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .stats-suspect-history { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+
+  /* ── Drone Pilot: Drones table (full parity with PIA Admin Panel) ── */
+  .dr-c-drone-col { flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 1px; }
+  .dr-c-deployed-col { width: 105px; flex-shrink: 0; color: var(--text-secondary); font-size: 12px; }
+  .dr-c-recalled-col { width: 130px; flex-shrink: 0; color: var(--text-secondary); font-size: 12px; }
+  .drone-identity-text { min-width: 0; }
+  .drone-id-line { font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .drone-id { font-weight: 600; color: var(--text-primary); }
+  .drone-pilot-line { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .drone-type-badge { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; padding: 1px 7px; border-radius: 20px; background: var(--bg-secondary); color: var(--text-secondary); border: 0.5px solid var(--border-medium); white-space: nowrap; }
+  .drone-battery-pill { display: inline-flex; align-items: center; font-size: 11px; color: var(--text-secondary); background: var(--bg-tertiary); padding: 2px 9px; border-radius: 20px; }
+  .drone-expand-panel { padding: 16px 18px; background: var(--bg-secondary); border-top: 0.5px solid var(--border-light); font-size: 13px; }
+  .drone-expand-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 28px; margin-bottom: 0; }
+  .drone-expand-grid-divided { position: relative; }
+  .drone-expand-grid-divided::after { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; border-left: 0.5px solid var(--border-light); }
+  .drone-expand-divider { border-top: 0.5px solid var(--border-light); margin: 24px 0; }
+  .drone-expand-section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-tertiary); margin-top: 24px; margin-bottom: 8px; }
+  .drone-expand-field { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 0.5px solid var(--border-light); font-size: 13px; }
+  .drone-expand-field .k { color: var(--text-secondary); }
+  .drone-expand-field .v { color: var(--text-primary); font-weight: 500; text-align: right; }
+  .drone-notes-block { background: var(--bg-primary); border: 0.5px solid var(--border-light); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-primary); line-height: 1.5; }
+  .cas-removal-reason { color: var(--text-secondary); }
+  .drone-missing-badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; color: var(--accent-strong); background: var(--accent-soft); padding: 2px 9px; border-radius: 20px; }
+  .drone-edit-btn { opacity: 0; transition: opacity 0.1s; border: none; background: none; cursor: pointer; color: var(--text-tertiary); width: 26px; height: 26px; border-radius: var(--radius-sm); }
+  .cas-remove-btn { border: none; background: none; cursor: pointer; color: var(--text-tertiary); width: 22px; height: 22px; border-radius: var(--radius-sm); display: inline-flex; align-items: center; justify-content: center; font-size: 14px; }
+  .cas-remove-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+  .cas-trash { opacity: 0; transition: opacity 0.1s; }
+  .drone-reached-btn.link { border: none; background: none; color: var(--accent); cursor: pointer; font-size: 12px; padding: 0; }
+  .cas-add-toggle { display: inline-flex; align-items: center; gap: 4px; padding: 5px 11px; font-size: 12px; font-weight: 500; border: 0.5px solid var(--border-medium); border-radius: var(--radius-sm); background: var(--bg-primary); color: var(--text-primary); cursor: pointer; white-space: nowrap; }
+  .cas-add-toggle:hover { background: var(--bg-tertiary); }
+  .cas-add-form { padding: 12px 14px; background: var(--bg-secondary); border-top: 0.5px solid var(--border-light); }
+  .cas-add-fields { display: flex; gap: 12px; align-items: flex-end; }
+  .cas-field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+  .cas-field .req { color: #d64545; }
+  .cas-field-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+  .cas-add-input { font-size: 13px; font-family: inherit; padding: 6px 9px; border: 0.5px solid var(--border-medium); border-radius: var(--radius-sm); color: var(--text-primary); background: var(--bg-primary); }
+  .cas-add-input:disabled { background: var(--bg-tertiary); color: var(--text-tertiary); cursor: not-allowed; }
+  .cas-add-btn { padding: 6px 14px; font-size: 12px; font-weight: 500; border-radius: var(--radius-sm); border: none; background: var(--accent); color: #fff; cursor: pointer; white-space: nowrap; }
+  .cas-add-btn:disabled { background: var(--border-medium); color: var(--text-tertiary); cursor: not-allowed; }
+  .cas-add-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .cas-empty-state { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 26px 14px; text-align: center; }
+  .cas-empty-copy { font-size: 13px; color: var(--text-secondary); }
+  .cas-empty-actions { display: flex; gap: 12px; justify-content: center; }
+  .pt-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px 0; margin-bottom: 6px; }
+  .pt-toolbar-left { display: flex; align-items: center; gap: 10px; }
+  .pt-count { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+  .pt-search { display: flex; align-items: center; gap: 8px; background: var(--bg-primary); border: 0.5px solid var(--border-medium); border-radius: var(--radius-sm); padding: 7px 11px; width: 240px; }
+  .pt-search i { color: var(--text-tertiary); font-size: 15px; }
+  .pt-search input { border: none; outline: none; background: none; font-size: 13px; color: var(--text-primary); width: 100%; font-family: inherit; }
+  .pt-empty { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 14px; text-align: center; font-size: 13px; color: var(--text-secondary); }
+  .time-mask { display: inline-flex; align-items: center; gap: 3px; border: 0.5px solid var(--border-medium); border-radius: var(--radius-sm); background: var(--bg-primary); padding: 6px 9px; }
+  .time-seg { width: 20px; border: none; outline: none; background: none; font-size: 13px; font-family: inherit; color: var(--text-primary); text-align: center; padding: 0; }
+  .time-colon { color: var(--text-tertiary); font-size: 13px; }
+  .time-ampm { border: 0.5px solid var(--border-medium); border-radius: 4px; background: var(--bg-secondary); font-size: 11px; font-weight: 600; color: var(--text-secondary); padding: 2px 6px; margin-left: 6px; cursor: pointer; font-family: inherit; }
+  .time-ampm:hover { background: var(--bg-tertiary); }
+
+  /* ── Modal (reused pattern) ── */
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(13,16,22,0.45); z-index: 2000; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: var(--bg-primary); border-radius: var(--radius-lg); width: 400px; max-width: calc(100vw - 32px); box-shadow: 0 16px 48px rgba(0,0,0,0.18); }
+  .modal-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 24px 24px 0; }
+  .modal-title { font-size: 17px; font-weight: 600; color: var(--text-primary); }
+  .modal-close-btn { background: none; border: none; cursor: pointer; color: var(--text-tertiary); font-size: 18px; display: flex; align-items: center; padding: 4px; border-radius: var(--radius-sm); }
+  .modal-close-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .modal-body { padding: 12px 24px 24px; font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+  .modal-footer { padding: 0 24px 24px; display: flex; justify-content: flex-end; gap: 8px; }
+</style>
+</head>
+<body>
+
+  <!-- ══════════════ Login page ══════════════ -->
+  <div class="page active" id="page-login">
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="login-card-body">
+          <div class="login-brand">
+            <div class="login-brand-logo"><i class="ti ti-shield-check"></i></div>
+            <span class="login-brand-name">Campus Guardian Angel</span>
+          </div>
+          <h1 class="login-title">Sign In</h1>
+          <div class="login-field">
+            <label for="login-email">Email</label>
+            <input id="login-email" class="login-input" type="email" placeholder="Enter Email" oninput="clearLoginError()" />
+          </div>
+          <div class="login-field">
+            <label for="login-password">Password</label>
+            <div class="login-input-wrap">
+              <input id="login-password" class="login-input" type="password" placeholder="Enter Password" oninput="clearLoginError()" style="padding-right:40px;" />
+              <button class="login-eye-btn" onclick="toggleLoginPassword()" aria-label="Show password"><i class="ti ti-eye" id="login-eye-icon"></i></button>
+            </div>
+            <p class="field-error" id="login-error">Enter your email and password to continue.</p>
+          </div>
+          <a class="login-forgot" href="#" onclick="return false;">Forgot the password?</a>
+        </div>
+        <div class="login-card-footer">
+          <button class="btn-primary" onclick="handleLoginContinue()">Continue</button>
+        </div>
+      </div>
+      <div class="login-page-footer">
+        <div class="links">
+          <a href="#" onclick="return false;">Terms of Service</a>
+          <a href="#" onclick="return false;">Privacy Policy</a>
+        </div>
+        <p class="copyright">&copy; Mithril Defense, 2026</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ Form page ══════════════ -->
+  <div class="page" id="page-form">
+    <div class="form-wrap">
+      <div class="form-header">
+        <div class="form-brand">
+          <div class="login-brand-logo"><i class="ti ti-shield-check"></i></div>
+          <span class="form-brand-name">Campus Guardian Angel</span>
+        </div>
+        <div class="member-switcher-row">
+          <div class="member-switcher">
+            <select id="member-select" onchange="switchMember(this.value)"></select>
+          </div>
+        </div>
+      </div>
+      <h1 class="form-page-title">Incident supplemental report</h1>
+
+      <div class="locked-banner" id="locked-banner" style="display:none;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <i class="ti ti-lock"></i>
+          <span id="locked-banner-text">Your supplemental report is locked. Click "Edit" to make changes.</span>
+        </div>
+        <button class="btn-secondary" onclick="enterEditMode()"><i class="ti ti-pencil"></i> Edit</button>
+      </div>
+      <div class="locked-banner" id="edit-mode-banner" style="display:none;background:#FEF3E2;color:#B45309;">
+        <i class="ti ti-pencil"></i>
+        <span id="edit-mode-banner-text">Editing your supplemental report.</span>
+      </div>
+
+      <div class="form-card" style="margin-bottom:20px;">
+        <div class="top-info-grid">
+          <div class="top-info-main">
+            <div class="form-section">
+              <div class="form-section-title">Incident info</div>
+              <div class="form-grid">
+                <div class="form-field"><label>Campus</label><div class="ro-value">Cypress Creek School</div></div>
+                <div class="form-field"><label>Address</label><div class="ro-value">482 Cypress Creek Rd, Meerfield, TX 75001</div></div>
+                <div class="form-field"><label>Incident ID</label><div class="ro-value">#INC-1042</div></div>
+                <div class="form-field"><label>Date &amp; time</label><div class="ro-value">Apr 24, 2026, 01:04 PM</div></div>
+                <div class="form-field"><label>Duration</label><div class="ro-value">2h 08m</div></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title">Your info</div>
+              <div class="form-grid">
+                <div class="form-field"><label>Full name</label><div class="ro-value" id="info-name">Jonathan Laborde</div></div>
+                <div class="form-field"><label>Email</label><div class="ro-value" id="info-email">jonathan.laborde@meerfieldisd.edu</div></div>
+                <div class="form-field"><label>Role in TOC</label><div class="ro-value" id="info-role">LE LNO</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="top-info-recording">
+            <div class="form-section-title">Screen recording</div>
+            <p class="recording-subtext">INC-1042 — Cypress Creek School</p>
+            <div class="recording-frame">
+              <div class="recording-play-btn"><i class="ti ti-player-play-filled"></i></div>
+              <div class="recording-caption">
+                <span class="recording-caption-name" id="recording-caption-name">Jonathan Laborde</span>
+                <span class="recording-duration-chip">1:59:44</span>
+              </div>
+            </div>
+            <p class="recording-help-text">Reference your own screen recording from the incident while writing your supplemental report.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-columns">
+        <div class="form-column-main">
+      <div class="form-card">
+        <div class="step-progress" id="step-progress">
+          <span class="step-progress-name" id="step-progress-name"></span>
+          <div class="step-progress-right">
+            <span class="step-progress-count" id="step-progress-count"></span>
+            <div class="step-progress-bar-track">
+              <div class="step-progress-bar-fill" id="step-progress-bar-fill"></div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel-container">
+          <div class="tab-panel" id="tab-panel-supplementalReport">
+            <p class="supplemental-report-mode-intro">If you've already written your supplemental report, you can upload it here. Additionally, you can write it directly.</p>
+
+            <div class="form-field">
+              <div class="dropzone" id="supplemental-report-dropzone" ondragover="handleDropzoneDragOver(event)" ondragleave="handleDropzoneDragLeave(event)" ondrop="handleDropzoneDrop(event)">
+                <div class="dropzone-state" id="dropzone-empty-state">
+                  <i class="ti ti-cloud-upload dropzone-icon"></i>
+                  <p class="dropzone-main-text">Drag and drop files here</p>
+                  <button class="btn-secondary" onclick="triggerFileInput()"><i class="ti ti-upload"></i> Upload</button>
+                  <p class="dropzone-support-text">PDF, DOC, DOCX, or TXT — up to 25MB each</p>
+                </div>
+                <div class="dropzone-state" id="dropzone-uploading-state" style="display:none;">
+                  <div class="upload-spinner"></div>
+                  <p class="dropzone-main-text">Uploading…</p>
+                </div>
+              </div>
+              <div id="supplemental-report-file-list"></div>
+              <input type="file" id="supplemental-report-file-input" style="display:none;" accept=".pdf,.doc,.docx,.txt" multiple onchange="onFileSelected(this)" />
+            </div>
+
+            <button class="btn-link" id="reveal-supplemental-report-text-btn" onclick="revealSupplementalReportText()" style="display:none;"><i class="ti ti-pencil"></i> Type your supplemental report instead</button>
+
+            <div class="form-field" id="supplemental-report-text-block" style="margin-top:18px;display:none;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;">Written supplemental report</label>
+                <button class="uploaded-file-remove" id="hide-supplemental-report-text-btn" onclick="hideSupplementalReportText()" title="Remove written supplemental report"><i class="ti ti-x"></i></button>
+              </div>
+              <textarea id="supplemental-report-input" placeholder="Describe your role and actions during this incident…" oninput="onFieldTyped('supplementalReport')" onblur="onFieldSaved('supplementalReport')"></textarea>
+              <div class="field-row-actions">
+                <span class="saved-indicator" id="supplementalReport-saved"><i class="ti ti-check"></i> Saved</span>
+              </div>
+            </div>
+
+            <label class="confirm-checkbox-row" style="margin-top:18px;">
+              <input type="checkbox" id="section-confirm-checkbox-supplementalReport" onchange="onSectionConfirmToggle('supplementalReport')">
+              <span>I have reviewed this information.</span>
+            </label>
+          </div>
+
+          <div class="explainer-callout" id="assigned-explainer" style="display:none;">
+            <i class="ti ti-info-circle"></i>
+            <div>
+              <p>The sections below show what the system captured during this incident. Review the data, and add a comment if you need to provide additional information or context.</p>
+            </div>
+          </div>
+
+          <div id="response-assets-body"></div>
+        </div>
+      </div>
+
+      <div class="form-footer split" id="submit-footer">
+        <button class="back-btn" onclick="goBackToLogin()"><i class="ti ti-arrow-left"></i> Back to sign in</button>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-secondary" id="step-back-btn" onclick="goToPrevStep()" style="visibility:hidden;">Back</button>
+          <button class="btn-primary" id="submit-btn" disabled onclick="goToNextStepOrSubmit()">Next</button>
+        </div>
+      </div>
+      <div class="form-footer split" id="locked-footer" style="display:none;">
+        <button class="back-btn" onclick="goBackToLogin()"><i class="ti ti-arrow-left"></i> Back to sign in</button>
+      </div>
+      <div class="form-footer split" id="edit-mode-footer" style="display:none;">
+        <button class="btn-secondary" onclick="cancelEditMode()">Cancel</button>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-secondary" id="edit-step-back-btn" onclick="goToPrevStep()" style="visibility:hidden;">Back</button>
+          <button class="btn-primary" id="save-edit-btn" disabled onclick="goToNextStepOrSubmit()">Next</button>
+        </div>
+      </div>
+        </div>
+      </div>
+
+      <div class="login-page-footer">
+        <div class="links">
+          <a href="#" onclick="return false;">Terms of Service</a>
+          <a href="#" onclick="return false;">Privacy Policy</a>
+        </div>
+        <p class="copyright">&copy; Mithril Defense, 2026</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="swap-toast" id="swap-toast"></div>
+
+  <!-- ══════════════ Remove officer modal (matches Admin Panel's shared delete-modal pattern) ══════════════ -->
+  <div class="modal-overlay" id="le-remove-overlay" onclick="closeLeRemoveModalOnOverlay(event)">
+    <div class="modal-box" onclick="event.stopPropagation()" style="max-width:430px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Remove entry?</h2>
+        <button class="modal-close-btn" onclick="cancelLeRemoveModal()" aria-label="Close"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p id="le-remove-modal-body" style="line-height:1.55;"></p>
+        <div style="margin-top:14px;">
+          <input class="cas-add-input" id="le-remove-reason" placeholder="Removal reason (required)" oninput="updateLeRemoveConfirmState()" style="width:100%;" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="cancelLeRemoveModal()">Cancel</button>
+        <button class="btn-primary" id="le-remove-confirm" onclick="confirmLeRemoveModal()" disabled>Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ Remove casualty modal (same pattern as the LE remove modal above) ══════════════ -->
+  <div class="modal-overlay" id="cas-remove-overlay" onclick="closeCasRemoveModalOnOverlay(event)">
+    <div class="modal-box" onclick="event.stopPropagation()" style="max-width:430px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Remove entry?</h2>
+        <button class="modal-close-btn" onclick="cancelCasRemoveModal()" aria-label="Close"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p id="cas-remove-modal-body" style="line-height:1.55;"></p>
+        <div style="margin-top:14px;">
+          <input class="cas-add-input" id="cas-remove-reason" placeholder="Removal reason (required)" oninput="updateCasRemoveConfirmState()" style="width:100%;" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="cancelCasRemoveModal()">Cancel</button>
+        <button class="btn-primary" id="cas-remove-confirm" onclick="confirmCasRemoveModal()" disabled>Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ Remove drone modal (same pattern as the LE/casualty remove modals above) ══════════════ -->
+  <div class="modal-overlay" id="drone-remove-overlay" onclick="closeDroneRemoveModalOnOverlay(event)">
+    <div class="modal-box" onclick="event.stopPropagation()" style="max-width:430px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Remove entry?</h2>
+        <button class="modal-close-btn" onclick="cancelDroneRemoveModal()" aria-label="Close"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p id="drone-remove-modal-body" style="line-height:1.55;"></p>
+        <div style="margin-top:14px;">
+          <input class="cas-add-input" id="drone-remove-reason" placeholder="Removal reason (required)" oninput="updateDroneRemoveConfirmState()" style="width:100%;" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="cancelDroneRemoveModal()">Cancel</button>
+        <button class="btn-primary" id="drone-remove-confirm" onclick="confirmDroneRemoveModal()" disabled>Remove</button>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+  // ── Login ──
+  function toggleLoginPassword() {
+    const input = document.getElementById('login-password');
+    const icon = document.getElementById('login-eye-icon');
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    icon.className = show ? 'ti ti-eye-off' : 'ti ti-eye';
+  }
+  function clearLoginError() {
+    document.getElementById('login-error').classList.remove('show');
+  }
+  function handleLoginContinue() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+    if (!email || !password) {
+      document.getElementById('login-error').classList.add('show');
+      return;
+    }
+    document.getElementById('page-login').classList.remove('active');
+    document.getElementById('page-form').classList.add('active');
+    initMemberSwitcher();
+  }
+  function goBackToLogin() {
+    document.getElementById('page-form').classList.remove('active');
+    document.getElementById('page-login').classList.add('active');
+  }
+
+  // ── TOC member switcher (testing aid — lets you preview any staffed role's form) ──
+  // Full roster kept here (commented) for easy revert — only LE Liaison and Medical are
+  // active in this prototype for now; this is a temporary trim, not a permanent product
+  // decision about who submits supplemental reports.
+  // { name: 'Rachel Stone',   email: 'rachel.stone@meerfieldisd.edu',  role: 'TOC Commander' },
+  // { name: 'Marcus Reed',    email: 'marcus.reed@meerfieldisd.edu',   role: 'Assistant TOC Commander' },
+  // { name: 'Elena Vasquez',  email: 'elena.vasquez@meerfieldisd.edu', role: 'Threat Tracker' },
+  // { name: 'David Kim',      email: 'david.kim@meerfieldisd.edu',     role: 'Common Operating Picture Manager' },
+  // { name: 'Nathan Brooks',  email: 'nathan.brooks@meerfieldisd.edu', role: 'Staff/Student Liaison' },
+  const TOC_MEMBERS = [
+    { name: 'Jonathan Laborde',  email: 'jonathan.laborde@meerfieldisd.edu', role: 'LE LNO' },
+    { name: 'Sam Shurley', email: 'sam.shurley@meerfieldisd.edu', role: 'TOC Commander' },
+    { name: 'Matt Clark',    email: 'matt.clark@meerfieldisd.edu',   role: 'TOC Commander Assistant' },
+    { name: 'Christian Van Sloun',   email: 'christian.vansloun@meerfieldisd.edu',  role: 'Drone Pilot' },
+    { name: 'Rylma Gattett', email: 'rylma.gattett@meerfieldisd.edu', role: 'School Staff LNO' },
+    { name: 'Ada Mccullough', email: 'ada.mccullough@meerfieldisd.edu', role: 'School Staff LNO' },
+    { name: 'Renee Castillo', email: 'renee.castillo@meerfieldisd.edu', role: 'Chief Drone Pilot' },
+    { name: 'Daniel Elkin', email: 'daniel.elkin@meerfieldisd.edu', role: 'COP Manager' },
+    { name: 'Alex Toll', email: 'alex.toll@meerfieldisd.edu', role: 'Threat Tracker' },
+  ];
+  // Every role goes through the same 5 assigned sections, in this order.
+
+  function initMemberSwitcher() {
+    const select = document.getElementById('member-select');
+    select.innerHTML = TOC_MEMBERS.map(m => `<option value="${escapeHtml(m.name)}">${escapeHtml(m.name)} — ${escapeHtml(m.role)}</option>`).join('');
+    const defaultMember = TOC_MEMBERS.find(m => m.role === 'LE LNO');
+    select.value = defaultMember.name;
+    switchMember(defaultMember.name);
+  }
+
+  function switchMember(name) {
+    const m = TOC_MEMBERS.find(x => x.name === name);
+    if (!m) return;
+    document.getElementById('info-name').textContent = m.name;
+    document.getElementById('info-email').textContent = m.email;
+    document.getElementById('info-role').textContent = m.role;
+    document.getElementById('recording-caption-name').textContent = m.name;
+    // Reset supplemental-report/lock/edit state so each member starts from a fresh, unsubmitted form —
+    // otherwise a previous member's submission would carry over.
+    formLocked = false;
+    editModeActive = false;
+    editSnapshot = null;
+    supplementalReportFiles = [];
+    supplementalReportTextRevealed = false;
+    document.getElementById('supplemental-report-input').value = '';
+    document.getElementById('supplemental-report-input').disabled = false;
+    document.getElementById('supplemental-report-file-input').value = '';
+    renderFileList();
+    showDropzoneState('empty');
+    document.querySelectorAll('.uploaded-file-remove').forEach(b => b.disabled = false);
+    updateSupplementalReportTextVisibility();
+    const supplementalReportCb = document.getElementById('section-confirm-checkbox-supplementalReport');
+    if (supplementalReportCb) { supplementalReportCb.checked = false; supplementalReportCb.disabled = false; }
+    document.getElementById('locked-banner').style.display = 'none';
+    document.getElementById('edit-mode-banner').style.display = 'none';
+    document.getElementById('submit-footer').style.display = 'flex';
+    document.getElementById('locked-footer').style.display = 'none';
+    document.getElementById('edit-mode-footer').style.display = 'none';
+    checkFormValid();
+    renderResponseAssets(m.role);
+  }
+
+  const ASSIGNED_SECTION_KEYS = ['recap', 'casualties', 'responseAssets', 'mobileUsers', 'communication'];
+  function secDom(key) {
+    return { actions: 'section-actions-' + key, note: 'section-note-' + key, checkbox: 'section-confirm-checkbox-' + key, input: 'section-comment-input-' + key, menu: 'comment-item-menu-' + key };
+  }
+  function resetSectionState(keys) {
+    sectionState = {}; sectionComment = {}; commentBoxOpen = {}; sectionConfirmed = {}; commentMenuOpen = {};
+    keys.forEach(k => { sectionState[k] = 'pending'; sectionComment[k] = ''; commentBoxOpen[k] = false; sectionConfirmed[k] = false; commentMenuOpen[k] = false; });
+  }
+
+  // ── Step wizard: Supplemental report, then one step per assigned-section key, shown one at a time —
+  // Back always available, Next disabled until the current step's confirmation checkbox is
+  // checked (and, for assigned sections, nothing is flagged incomplete). The same wizard
+  // (reset to step 1) is reused for editing after Submit. The one exception is the plain
+  // locked read-only view (submitted, not currently editing) — there, every step's content
+  // is shown at once as a summary, since there's nothing left to navigate through.
+  let currentStepKeys = ['supplementalReport'];
+  let currentStepIndex = 0;
+  let currentRole = null;
+  function stepLabel(key) {
+    if (key === 'supplementalReport') return 'Provide your supplemental report';
+    if (key === 'recap') return 'Review Incident recap';
+    if (key === 'casualties') return 'Review Casualties';
+    if (key === 'responseAssets') return 'Review Response Assets';
+    if (key === 'mobileUsers') return 'Review Mobile users';
+    if (key === 'communication') return 'Review Communication';
+    return 'Review assigned section';
+  }
+  function isWizardActive() { return !formLocked || editModeActive; }
+
+  function goToStep(index) {
+    currentStepIndex = index;
+    const wizard = isWizardActive();
+    currentStepKeys.forEach((k, i) => {
+      const panel = document.getElementById('tab-panel-' + k);
+      if (!panel) return;
+      panel.style.display = (!wizard || i === index) ? 'block' : 'none';
+      // In the locked "show everything" view, every section after the first gets a 64px
+      // gap + divider — driven by position in currentStepKeys (not DOM nesting), since
+      // supplementalReport lives in a different parent container than the other panels.
+      if (!wizard && i > 0) {
+        panel.style.marginTop = '32px';
+        panel.style.paddingTop = '32px';
+        panel.style.borderTop = '0.5px solid var(--border-light)';
+      } else {
+        panel.style.marginTop = '';
+        panel.style.paddingTop = '';
+        panel.style.borderTop = '';
+      }
+    });
+    const explainer = document.getElementById('assigned-explainer');
+    if (explainer) {
+      explainer.style.display = wizard
+        ? (currentStepKeys[index] === 'supplementalReport' ? 'none' : 'block')
+        : (currentStepKeys.some(k => k !== 'supplementalReport') ? 'block' : 'none');
+    }
+    updateWizardUI();
+  }
+  function goToPrevStep() {
+    if (currentStepIndex > 0) goToStep(currentStepIndex - 1);
+  }
+  function goToNextStepOrSubmit() {
+    const key = currentStepKeys[currentStepIndex];
+    const stepOk = !!sectionConfirmed[key] && !hasIncompleteAssignedSectionData(key);
+    if (!stepOk) return;
+    const isLast = currentStepIndex === currentStepKeys.length - 1;
+    if (isLast) {
+      if (editModeActive) saveEditChanges(); else handleSubmit();
+      return;
+    }
+    goToStep(currentStepIndex + 1);
+  }
+  // Refreshes the step progress bar and the Back/Next(Submit) buttons for whichever footer
+  // is currently visible (initial fill-out vs. edit mode). Doesn't touch panel visibility —
+  // goToStep() owns that; this only runs when content changes underneath the current step
+  // (e.g. typing, confirming, editing a row).
+  function updateWizardUI() {
+    const wizard = isWizardActive();
+    const progressEl = document.getElementById('step-progress');
+    if (progressEl) progressEl.style.display = wizard ? 'flex' : 'none';
+    if (!wizard) return;
+
+    const total = currentStepKeys.length;
+    const idx = Math.min(currentStepIndex, total - 1);
+    const key = currentStepKeys[idx];
+    const stepOk = !!sectionConfirmed[key] && !hasIncompleteAssignedSectionData(key);
+    const isLast = idx === total - 1;
+
+    // "Completed" counts steps whose checkbox is checked and not flagged incomplete — this
+    // updates the moment the current step's box is checked, even before clicking Next.
+    const completedCount = currentStepKeys.filter(k => !!sectionConfirmed[k] && !hasIncompleteAssignedSectionData(k)).length;
+    const nameEl = document.getElementById('step-progress-name');
+    if (nameEl) nameEl.textContent = stepLabel(key);
+    const countEl = document.getElementById('step-progress-count');
+    if (countEl) countEl.textContent = `${completedCount}/${total} completed`;
+    const fillEl = document.getElementById('step-progress-bar-fill');
+    if (fillEl) fillEl.style.width = `${(completedCount / total) * 100}%`;
+
+    const backId = editModeActive ? 'edit-step-back-btn' : 'step-back-btn';
+    const nextId = editModeActive ? 'save-edit-btn' : 'submit-btn';
+    const backBtn = document.getElementById(backId);
+    if (backBtn) backBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
+    const nextBtn = document.getElementById(nextId);
+    if (nextBtn) {
+      nextBtn.textContent = isLast ? (editModeActive ? 'Save changes' : 'Submit') : 'Next';
+      nextBtn.disabled = !stepOk;
+    }
+  }
+
+  function renderResponseAssets(role) {
+    currentRole = role;
+    const body = document.getElementById('response-assets-body');
+    currentSectionKeys = ASSIGNED_SECTION_KEYS;
+    currentStepKeys = ['supplementalReport', ...currentSectionKeys];
+    resetSectionState(currentStepKeys);
+
+    body.innerHTML = `
+      <div class="tab-panel" id="tab-panel-recap" style="display:none;">
+        <div class="assigned-section-header">
+          <div>
+            <div class="assigned-section-name">Incident recap</div>
+            <div class="assigned-section-desc" style="margin-bottom:0;">Stage progression and key timing metrics for this incident.</div>
+          </div>
+          <div id="section-actions-recap"></div>
+        </div>
+        <div id="recap-body" style="margin-top:14px;"></div>
+        <div id="section-note-recap"></div>
+        <label class="confirm-checkbox-row" style="margin-top:16px;">
+          <input type="checkbox" id="section-confirm-checkbox-recap" onchange="onSectionConfirmToggle('recap')">
+          <span>I have reviewed this information.</span>
+        </label>
+      </div>
+      <div class="tab-panel" id="tab-panel-casualties" style="display:none;">
+        <div class="assigned-section-header">
+          <div>
+            <div class="assigned-section-name">Casualties</div>
+            <div class="assigned-section-desc" style="margin-bottom:0;">Casualties recorded for this incident — minor injuries, life-threatening injuries, and fatalities.</div>
+          </div>
+          <div id="section-actions-casualties"></div>
+        </div>
+        <div id="casualties-body" style="margin-top:14px;"></div>
+        <div id="section-note-casualties"></div>
+        <label class="confirm-checkbox-row" style="margin-top:16px;">
+          <input type="checkbox" id="section-confirm-checkbox-casualties" onchange="onSectionConfirmToggle('casualties')">
+          <span>I have reviewed this information.</span>
+        </label>
+      </div>
+      <div class="tab-panel" id="tab-panel-responseAssets" style="display:none;">
+        <div class="assigned-section-header">
+          <div>
+            <div class="assigned-section-name">Response Assets</div>
+            <div class="assigned-section-desc" style="margin-bottom:0;">Personnel and drone assets deployed for this incident, captured automatically by the system.</div>
+          </div>
+          <div id="section-actions-responseAssets"></div>
+        </div>
+        <div class="tab-group" id="assets-tab-group" style="margin-top:16px;">
+          <button class="tab-btn active" data-tab="drones" id="assets-tab-drones" onclick="setAssetsTab('drones')">Drones</button>
+          <button class="tab-btn" data-tab="le" id="assets-tab-le" onclick="setAssetsTab('le')">LE personnel</button>
+          <button class="tab-btn" data-tab="toc" id="assets-tab-toc" onclick="setAssetsTab('toc')">TOC user personnel</button>
+        </div>
+        <div id="assets-panel-drones">
+          <div class="casualty-list-panel"><div id="drone-toolbar"></div><div id="drone-table-host"></div></div>
+        </div>
+        <div id="assets-panel-le" style="display:none;">
+          <div class="casualty-list-panel"><div id="le-toolbar"></div><div id="le-table-host"></div></div>
+        </div>
+        <div id="assets-panel-toc" style="display:none;">
+          <div class="casualty-list-panel"><div id="toc-personnel-table-host"></div></div>
+        </div>
+        <div id="section-note-responseAssets"></div>
+        <label class="confirm-checkbox-row" style="margin-top:16px;">
+          <input type="checkbox" id="section-confirm-checkbox-responseAssets" onchange="onSectionConfirmToggle('responseAssets')">
+          <span>I have reviewed this information.</span>
+        </label>
+      </div>
+      <div class="tab-panel" id="tab-panel-mobileUsers" style="display:none;">
+        <div class="assigned-section-header">
+          <div>
+            <div class="assigned-section-name">Mobile users</div>
+            <div class="assigned-section-desc" style="margin-bottom:0;">LE and staff who used the mobile app during this incident.</div>
+          </div>
+          <div id="section-actions-mobileUsers"></div>
+        </div>
+        <div id="mobile-users-body" style="margin-top:14px;"></div>
+        <div id="section-note-mobileUsers"></div>
+        <label class="confirm-checkbox-row" style="margin-top:16px;">
+          <input type="checkbox" id="section-confirm-checkbox-mobileUsers" onchange="onSectionConfirmToggle('mobileUsers')">
+          <span>I have reviewed this information.</span>
+        </label>
+      </div>
+      <div class="tab-panel" id="tab-panel-communication" style="display:none;">
+        <div class="assigned-section-header">
+          <div>
+            <div class="assigned-section-name">Communication</div>
+            <div class="assigned-section-desc" style="margin-bottom:0;">Coordination, medical, and verification channel activity for this incident.</div>
+          </div>
+          <div id="section-actions-communication"></div>
+        </div>
+        <div class="tab-group" id="comms-tab-group" style="margin-top:16px;">
+          <button class="tab-btn active" data-tab="coordination" onclick="setCommsTab('coordination')">Coordination</button>
+          <button class="tab-btn" data-tab="medical" onclick="setCommsTab('medical')">Medical</button>
+          <button class="tab-btn" data-tab="verification" onclick="setCommsTab('verification')">Verification</button>
+        </div>
+        <div id="comms-panel-coordination">
+          <div id="coordination-channel-body"></div>
+        </div>
+        <div id="comms-panel-medical" style="display:none;">
+          <div id="medical-channel-body"></div>
+        </div>
+        <div id="comms-panel-verification" style="display:none;">
+          <div id="verification-channel-body"></div>
+        </div>
+        <div id="section-note-communication"></div>
+        <label class="confirm-checkbox-row" style="margin-top:16px;">
+          <input type="checkbox" id="section-confirm-checkbox-communication" onchange="onSectionConfirmToggle('communication')">
+          <span>I have reviewed this information.</span>
+        </label>
+      </div>`;
+    casActiveTab = 'minor';
+    assetsActiveTab = 'drones';
+    commsActiveTab = 'coordination';
+    renderIncidentRecapSection();
+    renderCasualtiesSection();
+    renderLeTable();
+    renderDroneTable();
+    renderTocPersonnelSection();
+    renderCoordinationChannelSection();
+    renderMedicalChannelSection();
+    renderVerificationChannelSection();
+    renderMobileUsersSection();
+
+    currentSectionKeys.forEach(k => renderSectionActions(k));
+    currentStepIndex = 0;
+    goToStep(0);
+  }
+
+  // ── Form field autosave ──
+  let supplementalReportFiles = []; // [{ id, name, size }]
+  let nextFileId = 1;
+  let supplementalReportTextRevealed = false; // once the "Type your supplemental report instead" link is used, the
+                                      // textarea stays visible for the rest of this session/edit —
+                                      // it never collapses back on its own.
+  const fieldSaveTimers = {};
+  const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'txt'];
+  const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25MB
+
+  function revealSupplementalReportText() {
+    supplementalReportTextRevealed = true;
+    updateSupplementalReportTextVisibility();
+    document.getElementById('supplemental-report-input').focus();
+  }
+  // Lets a member back out of typing a supplemental report — clears whatever was typed and collapses
+  // back to just the reveal link, same as if they'd never clicked it.
+  function hideSupplementalReportText() {
+    supplementalReportTextRevealed = false;
+    document.getElementById('supplemental-report-input').value = '';
+    updateSupplementalReportTextVisibility();
+    onFieldSaved('supplementalReport');
+  }
+  // Attachments are always shown. The written-supplemental-report textarea is additive, not a
+  // replacement: it shows whenever there's already text (e.g. reopened via Edit), or once
+  // the reveal link has been used this session. The reveal link itself only makes sense
+  // while editable and there's nothing to show yet.
+  function updateSupplementalReportTextVisibility() {
+    const editable = !formLocked || editModeActive;
+    const hasText = document.getElementById('supplemental-report-input').value.trim().length > 0;
+    if (hasText) supplementalReportTextRevealed = true;
+    const showTextarea = hasText || (editable && supplementalReportTextRevealed);
+    const showLink = editable && !showTextarea;
+    document.getElementById('supplemental-report-text-block').style.display = showTextarea ? 'block' : 'none';
+    document.getElementById('reveal-supplemental-report-text-btn').style.display = showLink ? '' : 'none';
+    const hideBtn = document.getElementById('hide-supplemental-report-text-btn');
+    if (hideBtn) hideBtn.style.display = (showTextarea && editable) ? '' : 'none';
+  }
+
+  function onFieldTyped(field) {
+    document.getElementById(field + '-saved').classList.remove('show');
+    clearTimeout(fieldSaveTimers[field]);
+    fieldSaveTimers[field] = setTimeout(() => onFieldSaved(field), 800);
+  }
+  function onFieldSaved(field) {
+    clearTimeout(fieldSaveTimers[field]); // cancel any pending debounce so it can't fire again later
+    const indicator = document.getElementById(field + '-saved');
+    indicator.classList.add('show');
+    setTimeout(() => indicator.classList.remove('show'), 2000);
+    if (field === 'supplementalReport') clearSectionConfirmation('supplementalReport');
+    checkFormValid();
+    updateSaveEditValid();
+  }
+
+  // ── Dropzone: drag events ──
+  function handleDropzoneDragOver(e) {
+    e.preventDefault();
+    document.getElementById('supplemental-report-dropzone').classList.add('dragover');
+  }
+  function handleDropzoneDragLeave(e) {
+    e.preventDefault();
+    document.getElementById('supplemental-report-dropzone').classList.remove('dragover');
+  }
+  function handleDropzoneDrop(e) {
+    e.preventDefault();
+    document.getElementById('supplemental-report-dropzone').classList.remove('dragover');
+    if (e.dataTransfer.files && e.dataTransfer.files.length) processFiles(e.dataTransfer.files);
+  }
+  function triggerFileInput() { document.getElementById('supplemental-report-file-input').click(); }
+  function onFileSelected(input) {
+    if (!input.files || !input.files.length) return;
+    processFiles(input.files);
+    input.value = ''; // allow re-selecting the same filename later
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+  function validateFile(file) {
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      return { valid: false, message: `${file.name} — unsupported file type` };
+    }
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      return { valid: false, message: `${file.name} — exceeds the 25MB limit` };
+    }
+    return { valid: true };
+  }
+
+  function showDropzoneState(state) {
+    ['empty', 'uploading'].forEach(s => {
+      document.getElementById('dropzone-' + s + '-state').style.display = s === state ? 'flex' : 'none';
+    });
+  }
+
+  // Accepts a FileList (from either the file picker or a drag-drop event). Valid files are
+  // added to the list; invalid ones are skipped and reported together in one toast — one bad
+  // file in a batch never blocks the rest.
+  function processFiles(fileList) {
+    const files = Array.from(fileList);
+    const valid = [];
+    const errors = [];
+    files.forEach(f => {
+      const result = validateFile(f);
+      if (result.valid) valid.push(f); else errors.push(result.message);
+    });
+    if (errors.length) showErrorToast(errors.join(' · '));
+    if (!valid.length) return;
+
+    showDropzoneState('uploading');
+    setTimeout(() => {
+      valid.forEach(f => supplementalReportFiles.push({ id: nextFileId++, name: f.name, size: f.size }));
+      showDropzoneState('empty');
+      renderFileList();
+      onFieldSaved('supplementalReport');
+    }, 700);
+  }
+
+  function deleteSupplementalReportFile(id) {
+    supplementalReportFiles = supplementalReportFiles.filter(f => f.id !== id);
+    renderFileList();
+    onFieldSaved('supplementalReport');
+  }
+
+  function renderFileList() {
+    const host = document.getElementById('supplemental-report-file-list');
+    const editable = !formLocked || editModeActive;
+    host.innerHTML = supplementalReportFiles.map(f => `
+      <div class="uploaded-file-chip">
+        <i class="ti ti-file-description"></i>
+        <span class="uploaded-file-name">${escapeHtml(f.name)}</span>
+        <span class="uploaded-file-size">${formatFileSize(f.size)}</span>
+        <button class="uploaded-file-remove" onclick="deleteSupplementalReportFile(${f.id})" title="Remove file" ${editable ? '' : 'disabled'}><i class="ti ti-trash"></i></button>
+      </div>`).join('');
+  }
+
+  function showErrorToast(message) {
+    const el = document.getElementById('swap-toast');
+    el.textContent = message;
+    el.classList.add('show');
+    clearTimeout(showErrorToast._t);
+    showErrorToast._t = setTimeout(() => el.classList.remove('show'), 4000);
+  }
+
+
+
+  // ── Assigned section: comment (optional) + confirmation checkbox (required for Submit/Save) ──
+  // State is keyed by section key — every role goes through the same 5 keys in
+  // ASSIGNED_SECTION_KEYS. See secDom().
+  let sectionState = {};      // key -> 'pending' | 'commented'
+  let sectionComment = {};    // key -> string
+  let commentBoxOpen = {};    // key -> bool
+  let sectionConfirmed = {};  // key -> bool
+  let commentMenuOpen = {};   // key -> bool
+  let currentSectionKeys = ASSIGNED_SECTION_KEYS; // which keys are active for the currently-viewed role
+
+  // ── Tab-group switchers (Response Assets / Communication) — pure show/hide, no re-render
+  // of the underlying table/panel content, which is populated once and kept in the DOM. ──
+  let assetsActiveTab = 'drones';
+  function setAssetsTab(type) {
+    assetsActiveTab = type;
+    document.querySelectorAll('#assets-tab-group .tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === type));
+    ['drones', 'le', 'toc'].forEach(t => {
+      const el = document.getElementById('assets-panel-' + t);
+      if (el) el.style.display = (t === type) ? 'block' : 'none';
+    });
+  }
+  let commsActiveTab = 'coordination';
+  function setCommsTab(channel) {
+    commsActiveTab = channel;
+    document.querySelectorAll('#comms-tab-group .tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === channel));
+    ['coordination', 'medical', 'verification'].forEach(t => {
+      const el = document.getElementById('comms-panel-' + t);
+      if (el) el.style.display = (t === channel) ? 'block' : 'none';
+    });
+    renderChannelChart(channel);
+  }
+
+  function onSectionConfirmToggle(key) {
+    const dom = secDom(key);
+    sectionConfirmed[key] = document.getElementById(dom.checkbox).checked;
+    checkFormValid();
+    updateSaveEditValid();
+  }
+
+  // Any change to the assigned section's content after it was confirmed invalidates that
+  // confirmation — the member has to look at the (now different) data and re-confirm.
+  function clearSectionConfirmation(key) {
+    if (!sectionConfirmed[key]) return;
+    sectionConfirmed[key] = false;
+    const dom = secDom(key);
+    const cb = document.getElementById(dom.checkbox);
+    if (cb) cb.checked = false;
+    checkFormValid();
+    updateSaveEditValid();
+  }
+
+  function renderSectionActions(key) {
+    const dom = secDom(key);
+    const isCommented = sectionState[key] === 'commented';
+    let actionsHtml = '';
+    if (commentBoxOpen[key]) {
+      actionsHtml = '';
+    } else if (isCommented) {
+      actionsHtml = `
+        <div class="comment-actions-wrap">
+          <button class="asset-action-btn" onclick="toggleCommentMenu('${key}', event)" title="More options"><i class="ti ti-dots-vertical"></i></button>
+          <div class="item-menu ${commentMenuOpen[key] ? 'open' : ''}" id="${dom.menu}">
+            <button class="item-menu-option" onclick="editComment('${key}')"><i class="ti ti-pencil"></i> Edit</button>
+            <button class="item-menu-option danger" onclick="deleteComment('${key}')"><i class="ti ti-trash"></i> Delete</button>
+          </div>
+        </div>`;
+    } else {
+      actionsHtml = `<button class="btn-secondary" onclick="toggleCommentBox('${key}')"><i class="ti ti-message-circle"></i> Add comment</button>`;
+    }
+    const actionsEl = document.getElementById(dom.actions);
+    if (actionsEl) actionsEl.innerHTML = actionsHtml;
+
+    let noteHtml = '';
+    if (commentBoxOpen[key]) {
+      noteHtml = `<div style="margin-top:10px;">
+        <textarea id="${dom.input}" style="width:100%;min-height:64px;padding:8px 10px;font-family:inherit;font-size:13px;border:0.5px solid var(--border-medium);border-radius:6px;" placeholder="What needs to be corrected?">${escapeHtml(sectionComment[key])}</textarea>
+        <div style="margin-top:8px;display:flex;gap:8px;">
+          <button class="btn-secondary" onclick="saveComment('${key}')">Save comment</button>
+          <button class="btn-secondary" style="background:transparent;border-color:transparent;" onclick="cancelCommentBox('${key}')">Cancel</button>
+        </div>
+      </div>`;
+    } else if (isCommented && sectionComment[key]) {
+      noteHtml = `<div class="review-note" style="margin-top:10px;">${escapeHtml(sectionComment[key])}</div>`;
+    }
+    const noteEl = document.getElementById(dom.note);
+    if (noteEl) noteEl.innerHTML = noteHtml;
+    checkFormValid();
+  }
+  function toggleCommentBox(key) {
+    commentMenuOpen[key] = false;
+    commentBoxOpen[key] = !commentBoxOpen[key];
+    renderSectionActions(key);
+  }
+  function cancelCommentBox(key) {
+    commentBoxOpen[key] = false;
+    renderSectionActions(key);
+  }
+  function saveComment(key) {
+    const dom = secDom(key);
+    const val = document.getElementById(dom.input).value.trim();
+    sectionComment[key] = val;
+    sectionState[key] = val ? 'commented' : 'pending';
+    commentBoxOpen[key] = false;
+    clearSectionConfirmation(key);
+    renderSectionActions(key);
+  }
+  function toggleCommentMenu(key, e) {
+    if (e) e.stopPropagation();
+    commentMenuOpen[key] = !commentMenuOpen[key];
+    renderSectionActions(key);
+  }
+  function editComment(key) {
+    commentMenuOpen[key] = false;
+    commentBoxOpen[key] = true;
+    renderSectionActions(key);
+  }
+  function deleteComment(key) {
+    sectionComment[key] = '';
+    sectionState[key] = 'pending';
+    commentMenuOpen[key] = false;
+    clearSectionConfirmation(key);
+    renderSectionActions(key);
+  }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.comment-actions-wrap')) {
+      Object.keys(commentMenuOpen).forEach(key => {
+        if (commentMenuOpen[key]) { commentMenuOpen[key] = false; renderSectionActions(key); }
+      });
+    }
+  });
+  function escapeHtml(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  // Checked in addition to the confirmation checkbox — a member can't advance past a step
+  // the system itself flags as incomplete (e.g. a drone with a "Missing" reached-target
+  // time, or an unresolved Fatalities category in Casualties, or — for Supplemental
+  // report — no text and no attachments yet). LE personnel has no gap-fill field of its
+  // own (arrival time was removed), so it falls through to the default below — that part
+  // of Response Assets is gated by the section's confirm checkbox alone.
+  function hasIncompleteAssignedSectionData(key) {
+    if (key === 'supplementalReport') {
+      return !(document.getElementById('supplemental-report-input').value.trim().length > 0 || supplementalReportFiles.length > 0);
+    }
+    if (key === 'responseAssets' && (currentRole === 'Drone Pilot' || currentRole === 'Chief Drone Pilot') && document.getElementById('drone-table-host')) {
+      return droneList().some(d => !isDroneRemoved(d) && !getDroneReached(d));
+    }
+    if (key === 'casualties' && currentRole === 'TOC Commander Assistant') {
+      return !fatalityResolved();
+    }
+    return false; // LE personnel and Medical channel are gated by their checkbox alone; other placeholders have nothing to flag
+  }
+
+  // ── Submit validity ── Requires EVERY step's confirmation checkbox checked, AND no
+  // unresolved/"Missing"/empty data on any step (Supplemental report included). The step wizard's
+  // own Back/Next gating already enforces this one step at a time as the member moves
+  // forward, but this stays as the authoritative check behind the final Submit/Save button.
+  function checkFormValid() {
+    updateWizardUI();
+    if (formLocked) return;
+    const btn = document.getElementById('submit-btn');
+    const allConfirmed = currentStepKeys.every(k => sectionConfirmed[k]);
+    const anyIncomplete = currentStepKeys.some(k => hasIncompleteAssignedSectionData(k));
+    if (btn) btn.disabled = !(allConfirmed && !anyIncomplete);
+  }
+
+  // ── Submit → locked read-only view ──
+  let formLocked = false;
+  function handleSubmit() {
+    formLocked = true;
+    document.getElementById('supplemental-report-input').disabled = true;
+    document.getElementById('locked-banner-text').textContent = 'Your supplemental report is locked. Click "Edit" to make changes.';
+    document.getElementById('locked-banner').style.display = 'flex';
+    document.getElementById('submit-footer').style.display = 'none';
+    document.getElementById('locked-footer').style.display = 'flex';
+    document.getElementById('member-select').disabled = true;
+    document.querySelectorAll('.uploaded-file-remove').forEach(b => b.disabled = true);
+    renderFileList();
+    updateSupplementalReportTextVisibility();
+    setSectionActionsEnabled(false);
+    if (document.getElementById('le-table-host')) renderLeTable();
+    if (document.getElementById('drone-table-host')) renderDroneTable();
+    if (document.getElementById('casualties-body')) renderCasualtiesSection();
+    goToStep(0); // locked + not editing → isWizardActive() is false, so this shows the full read-only summary
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── Edit (direct — no super admin approval needed) ──
+  // Supplemental report's text and attachments are both always editable together — no separate paths.
+  // Editing reuses the exact same step wizard as the initial fill-out, reset to step 1.
+  let editModeActive = false;
+  let editSnapshot = null;
+
+  function setSectionActionsEnabled(enabled) {
+    currentStepKeys.forEach(key => {
+      const dom = secDom(key);
+      const actionsEl = document.getElementById(dom.actions);
+      if (actionsEl) {
+        actionsEl.querySelectorAll('.btn-secondary, .asset-action-btn').forEach(b => {
+          b.disabled = !enabled;
+          b.style.opacity = enabled ? '' : '0.45';
+          b.style.cursor = enabled ? '' : 'not-allowed';
+        });
+      }
+      const cb = document.getElementById(dom.checkbox);
+      if (cb) cb.disabled = !enabled;
+    });
+  }
+
+  function enterEditMode() {
+    editModeActive = true;
+    editSnapshot = {
+      text: document.getElementById('supplemental-report-input').value,
+      files: JSON.parse(JSON.stringify(supplementalReportFiles)),
+      textRevealed: supplementalReportTextRevealed,
+      sectionState: JSON.parse(JSON.stringify(sectionState)),
+      sectionComment: JSON.parse(JSON.stringify(sectionComment)),
+      sectionConfirmed: JSON.parse(JSON.stringify(sectionConfirmed)),
+      officerNotes: JSON.parse(JSON.stringify(officerNotes)),
+      officerRemovals: JSON.parse(JSON.stringify(officerRemovals)),
+      manualOfficers: JSON.parse(JSON.stringify(manualOfficers)),
+      droneReachedTarget: JSON.parse(JSON.stringify(droneReachedTarget)),
+      droneNotes: JSON.parse(JSON.stringify(droneNotes)),
+      droneRemovals: JSON.parse(JSON.stringify(droneRemovals)),
+      manualDrones: JSON.parse(JSON.stringify(manualDrones)),
+      casualtyReport: JSON.parse(JSON.stringify(casualtyReport)),
+    };
+    document.getElementById('locked-banner').style.display = 'none';
+    document.getElementById('edit-mode-banner-text').textContent = 'Editing your supplemental report. Edit the text, add or remove attachments, or both.';
+    document.getElementById('edit-mode-banner').style.display = 'flex';
+    document.getElementById('locked-footer').style.display = 'none';
+    document.getElementById('edit-mode-footer').style.display = 'flex';
+
+    // Re-enable the supplemental report's text and attachments together.
+    document.getElementById('supplemental-report-input').disabled = false;
+    document.querySelectorAll('.uploaded-file-remove').forEach(b => b.disabled = false);
+    renderFileList();
+    updateSupplementalReportTextVisibility();
+
+    // Assigned sections become editable again too — the LE table / Casualties table (if this
+    // role has one) and the Add comment action for everyone else. Medical channel stays
+    // read-only regardless (nothing to re-enable there beyond the comment/confirm controls,
+    // which setSectionActionsEnabled already covers).
+    setSectionActionsEnabled(true);
+    if (document.getElementById('le-table-host')) renderLeTable();
+    if (document.getElementById('drone-table-host')) renderDroneTable();
+    if (document.getElementById('casualties-body')) renderCasualtiesSection();
+
+    currentStepIndex = 0;
+    goToStep(0);
+  }
+
+  function cancelEditMode() {
+    // Fully reverts to the state everything was in before this edit session began —
+    // Supplemental report (text + attachments) and any assigned-section edits (LE table, Casualties, comments).
+    document.getElementById('supplemental-report-input').value = editSnapshot.text;
+    supplementalReportFiles = editSnapshot.files;
+    supplementalReportTextRevealed = editSnapshot.textRevealed;
+    sectionState = editSnapshot.sectionState;
+    sectionComment = editSnapshot.sectionComment;
+    sectionConfirmed = editSnapshot.sectionConfirmed;
+    currentStepKeys.forEach(key => {
+      const dom = secDom(key);
+      const cb = document.getElementById(dom.checkbox);
+      if (cb) cb.checked = !!sectionConfirmed[key];
+    });
+    commentBoxOpen = {};
+    currentStepKeys.forEach(k => commentBoxOpen[k] = false);
+    officerNotes = editSnapshot.officerNotes;
+    officerRemovals = editSnapshot.officerRemovals;
+    manualOfficers = editSnapshot.manualOfficers;
+    droneReachedTarget = editSnapshot.droneReachedTarget;
+    droneNotes = editSnapshot.droneNotes;
+    droneRemovals = editSnapshot.droneRemovals;
+    manualDrones = editSnapshot.manualDrones;
+    casualtyReport = editSnapshot.casualtyReport;
+    editModeActive = false;
+    editSnapshot = null;
+    document.getElementById('supplemental-report-input').disabled = true;
+    document.querySelectorAll('.uploaded-file-remove').forEach(b => b.disabled = true);
+    renderFileList();
+    updateSupplementalReportTextVisibility();
+    document.getElementById('edit-mode-banner').style.display = 'none';
+    document.getElementById('edit-mode-footer').style.display = 'none';
+    document.getElementById('locked-banner').style.display = 'flex';
+    document.getElementById('locked-footer').style.display = 'flex';
+    setSectionActionsEnabled(false);
+    currentSectionKeys.forEach(k => renderSectionActions(k));
+    if (document.getElementById('le-table-host')) renderLeTable();
+    if (document.getElementById('drone-table-host')) renderDroneTable();
+    if (document.getElementById('casualties-body')) renderCasualtiesSection();
+    currentStepIndex = 0;
+    goToStep(0);
+  }
+
+  // Enabled by default while editing — being in edit mode already implies a change is
+  // intended. Disabled if: the current step's confirmation checkbox isn't checked, or the
+  // current step still has "Missing"/unresolved/empty data. Kept as the authoritative check
+  // behind the final Save-changes button, same role checkFormValid() plays for Submit.
+  function updateSaveEditValid() {
+    updateWizardUI();
+    if (!editModeActive) return;
+    const btn = document.getElementById('save-edit-btn');
+    if (!btn) return;
+    const allConfirmed = currentStepKeys.every(k => sectionConfirmed[k]);
+    const anyIncomplete = currentStepKeys.some(k => hasIncompleteAssignedSectionData(k));
+    btn.disabled = !allConfirmed || anyIncomplete;
+  }
+
+  function saveEditChanges() {
+    editModeActive = false;
+    editSnapshot = null;
+    document.getElementById('supplemental-report-input').disabled = true;
+    document.querySelectorAll('.uploaded-file-remove').forEach(b => b.disabled = true);
+    renderFileList();
+    updateSupplementalReportTextVisibility();
+    document.getElementById('edit-mode-banner').style.display = 'none';
+    document.getElementById('edit-mode-footer').style.display = 'none';
+    document.getElementById('locked-banner-text').textContent = 'Your supplemental report has been edited and is locked. Click "Edit" to make further changes.';
+    document.getElementById('locked-banner').style.display = 'flex';
+    document.getElementById('locked-footer').style.display = 'flex';
+    setSectionActionsEnabled(false);
+    currentSectionKeys.forEach(k => renderSectionActions(k));
+    if (document.getElementById('le-table-host')) renderLeTable();
+    if (document.getElementById('drone-table-host')) renderDroneTable();
+    if (document.getElementById('casualties-body')) renderCasualtiesSection();
+    currentStepIndex = 0;
+    goToStep(0);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  LAW ENFORCEMENT PERSONNEL TABLE — ported from the Admin Panel's
+  //  Overview tab (same markup, CSS, and interactions). Runs on local
+  //  state here since this is a separate, standalone prototype file.
+  // ══════════════════════════════════════════════════════════════════════
+  // Dana Reyes/Marcus Webb/Linda Cho are the PIA panel's own officerAssetData (real system
+  // roster). The other 9 aren't in that array, but they do appear in the incident's real
+  // Coordination channel activity — their first join / last leave from that channel is used
+  // here as a grounded stand-in for Joined at/Left at, rather than inventing times.
+  const officerAssetData = [
+    { name: 'Dana Reyes',  role: 'Law Enforcement', joinedAt: '01:05:00 PM', leftAt: '03:04:37 PM' },
+    { name: 'Marcus Webb', role: 'Law Enforcement', joinedAt: '01:07:31 PM', leftAt: '03:04:44 PM' },
+    { name: 'Linda Cho',   role: 'Law Enforcement', joinedAt: '01:08:44 PM', leftAt: null },
+    { name: 'Joel Ferreira', role: 'Law Enforcement', joinedAt: '01:09:45 PM', leftAt: '01:55:00 PM' },
+    { name: 'Isla Jones',    role: 'Law Enforcement', joinedAt: '01:10:30 PM', leftAt: '01:57:30 PM' },
+    { name: 'Jake King',     role: 'Law Enforcement', joinedAt: '01:11:30 PM', leftAt: '02:00:30 PM' },
+    { name: 'Paul Ross',     role: 'Law Enforcement', joinedAt: '01:12:15 PM', leftAt: '02:02:15 PM' },
+    { name: 'Carl Cruz',     role: 'Law Enforcement', joinedAt: '01:12:50 PM', leftAt: '02:04:40 PM' },
+    { name: 'Dawn Dixon',    role: 'Law Enforcement', joinedAt: '01:13:20 PM', leftAt: '02:06:20 PM' },
+    { name: 'Jade Jensen',   role: 'Law Enforcement', joinedAt: '01:13:50 PM', leftAt: '02:09:10 PM' },
+    { name: 'Sue Shaw',      role: 'Law Enforcement', joinedAt: '01:14:10 PM', leftAt: '02:12:00 PM' },
+    { name: 'Todd Tran',     role: 'Law Enforcement', joinedAt: '01:14:50 PM', leftAt: '02:13:45 PM' },
+  ];
+  let officerNotes = {};
+  let officerRemovals = {};
+  let manualOfficers = [];
+  const leSearchState = { q: '' };
+  const leNoteOpen = {};
+  const leEditRowOpen = {};
+  let leAddFormOpen = false;
+  let leRemoveTargetIndex = null;
+
+  function parseClock(t) {
+    if (!t) return null;
+    const m = t.match(/(\d+):(\d+):(\d+)\s*(AM|PM)/i);
+    if (!m) return null;
+    let h = (+m[1]) % 12; if (/PM/i.test(m[4])) h += 12;
+    return h * 3600 + (+m[2]) * 60 + (+m[3]);
+  }
+  function leOfficerList() {
+    const sortKey = o => {
+      const j = parseClock(o.joinedAt);
+      return j != null ? j : Infinity;
+    };
+    return [...officerAssetData, ...manualOfficers].sort((a, b) => sortKey(a) - sortKey(b));
+  }
+  function getLeNote(o) { return o.manual ? (o.note || '') : (officerNotes[o.name] || ''); }
+  function isLeRemoved(o) { return o.manual ? !!o.removed : !!officerRemovals[o.name]; }
+  function getLeRemovalReason(o) { return o.manual ? (o.removalReason || '') : (officerRemovals[o.name] || ''); }
+
+  function toggleLeNote(i) { leNoteOpen[i] = !leNoteOpen[i]; renderLeTable(); }
+  function onLeSearch(val) {
+    leSearchState.q = val;
+    renderLeTable();
+    const el = document.querySelector('#le-toolbar .pt-search input');
+    if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+  }
+  function clearLeSearch() { leSearchState.q = ''; renderLeTable(); }
+
+  function startLeEdit(i) {
+    Object.keys(leEditRowOpen).forEach(k => delete leEditRowOpen[k]);
+    leEditRowOpen[i] = true;
+    renderLeTable();
+  }
+  function cancelLeEdit(i) { delete leEditRowOpen[i]; renderLeTable(); }
+  function saveLeEdit(i) {
+    const officer = leOfficerList()[i];
+    if (!officer) return;
+    const noteEl = document.getElementById(`le-note-${i}`);
+    const noteVal = noteEl ? noteEl.value : '';
+    if (officer.manual) {
+      const nameEl = document.getElementById(`le-name-${i}`);
+      const name = nameEl ? nameEl.value.trim() : officer.name;
+      if (!name) return;
+      officer.name = name;
+      officer.note = noteVal;
+    } else {
+      officerNotes[officer.name] = noteVal;
+    }
+    delete leEditRowOpen[i];
+    clearSectionConfirmation("main");
+    renderLeTable();
+  }
+
+  function toggleLeAddForm() {
+    leAddFormOpen = !leAddFormOpen;
+    if (leAddFormOpen) Object.keys(leEditRowOpen).forEach(k => delete leEditRowOpen[k]);
+    renderLeTable();
+    if (leAddFormOpen) { const el = document.getElementById('le-add-name'); if (el) el.focus(); }
+  }
+  function cancelLeAddForm() { leAddFormOpen = false; renderLeTable(); }
+  function onLeAddInput() {
+    const name = (document.getElementById('le-add-name').value || '').trim();
+    const btn = document.getElementById('le-add-btn');
+    if (btn) btn.disabled = !name;
+  }
+  function addOfficerRow() {
+    const name = (document.getElementById('le-add-name').value || '').trim();
+    if (!name) return;
+    const noteEl = document.getElementById('le-add-note');
+    const note = noteEl ? noteEl.value.trim() : '';
+    manualOfficers.push({ name, role: 'Law Enforcement', joinedAt: null, leftAt: null, note, manual: true, removed: false, removalReason: '' });
+    leAddFormOpen = false;
+    leSearchState.q = '';
+    Object.keys(leEditRowOpen).forEach(k => delete leEditRowOpen[k]);
+    Object.keys(leNoteOpen).forEach(k => delete leNoteOpen[k]);
+    clearSectionConfirmation("main");
+    renderLeTable();
+  }
+
+  function startLeRemove(i) {
+    const officer = leOfficerList()[i];
+    if (!officer) return;
+    leRemoveTargetIndex = i;
+    document.getElementById('le-remove-modal-body').innerHTML =
+      `Remove <b>${escapeHtml(officer.name)}</b> from <b>Law Enforcement</b>? This changes the recorded response roster on a report that may be used as an official record. The entry stays visible, marked as removed with your reason.`;
+    const reasonEl = document.getElementById('le-remove-reason');
+    reasonEl.value = '';
+    updateLeRemoveConfirmState();
+    document.getElementById('le-remove-overlay').classList.add('open');
+    setTimeout(() => reasonEl.focus(), 50);
+  }
+  function updateLeRemoveConfirmState() {
+    const btn = document.getElementById('le-remove-confirm');
+    const el = document.getElementById('le-remove-reason');
+    if (btn) btn.disabled = !(el && el.value.trim());
+  }
+  function cancelLeRemoveModal() {
+    leRemoveTargetIndex = null;
+    document.getElementById('le-remove-overlay').classList.remove('open');
+  }
+  function closeLeRemoveModalOnOverlay(e) {
+    if (e.target.id === 'le-remove-overlay') cancelLeRemoveModal();
+  }
+  function confirmLeRemoveModal() {
+    const reason = document.getElementById('le-remove-reason').value.trim();
+    if (!reason) return; // Confirm is disabled until a reason is entered; guard anyway
+    const officer = leOfficerList()[leRemoveTargetIndex];
+    if (officer) {
+      if (officer.manual) { officer.removed = true; officer.removalReason = reason; }
+      else { officerRemovals[officer.name] = reason; }
+    }
+    document.getElementById('le-remove-overlay').classList.remove('open');
+    leRemoveTargetIndex = null;
+    clearSectionConfirmation("main");
+    renderLeTable();
+  }
+  function undoLeRemove(i) {
+    const officer = leOfficerList()[i];
+    if (!officer) return;
+    if (officer.manual) { officer.removed = false; officer.removalReason = ''; }
+    else { delete officerRemovals[officer.name]; }
+    clearSectionConfirmation("main");
+    renderLeTable();
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  TOC user personnel — read-only reference view modeled on the PIA Admin
+  //  Panel's "TOC Operators involved" table (Name/Role/Connected/Left).
+  //  Screen Recording column dropped per user decision — this standalone
+  //  form has no recording playback of its own.
+  // ══════════════════════════════════════════════════════════════════════
+  const TOC_PERSONNEL = [
+    { name: 'Rachel Stone', role: 'TOC Commander', connectedAt: '01:04:02 PM', leftAt: null },
+    { name: 'James Cole', role: 'TOC Operator', connectedAt: '01:04:10 PM', leftAt: null },
+    { name: 'Maria Lopez', role: 'TOC Operator', connectedAt: '01:09:30 PM', leftAt: '02:45:00 PM' },
+  ];
+  function renderTocPersonnelSection() {
+    const host = document.getElementById('toc-personnel-table-host');
+    if (!host) return;
+    const header = `
+      <div class="cas-row2 cas-head">
+        <span class="toc-c-name">Name</span>
+        <span class="toc-c-role">Role</span>
+        <span class="toc-c-conn">Connected</span>
+        <span class="toc-c-left">Left</span>
+      </div>`;
+    const rows = TOC_PERSONNEL.map(p => `
+      <div class="cas-row2">
+        <span class="toc-c-name">${escapeHtml(p.name)}</span>
+        <span class="toc-c-role">${escapeHtml(p.role)}</span>
+        <span class="toc-c-conn">${p.connectedAt}</span>
+        <span class="toc-c-left">${p.leftAt || '—'}</span>
+      </div>`).join('');
+    host.innerHTML = header + rows;
+    const tocTab = document.getElementById('assets-tab-toc');
+    if (tocTab) tocTab.textContent = `TOC user personnel (${TOC_PERSONNEL.length})`;
+  }
+
+  function renderLeTable() {
+    const toolbarEl = document.getElementById('le-toolbar');
+    const host = document.getElementById('le-table-host');
+    if (!host) return;
+    // Data may have just changed (officer added/removed/edited) — re-evaluate whether
+    // Submit/Save can be enabled.
+    checkFormValid();
+    updateSaveEditValid();
+    const editing = !formLocked || editModeActive;
+    const sorted = leOfficerList();
+    const leTab = document.getElementById('assets-tab-le');
+    if (leTab) leTab.textContent = `LE personnel (${sorted.filter(o => !isLeRemoved(o)).length})`;
+
+    const headerAddBtn = (editing && sorted.length > 0)
+      ? `<button class="cas-add-toggle" onclick="toggleLeAddForm()"><i class="ti ti-plus"></i> Add person</button>`
+      : '';
+
+    let toolbar = '';
+    if (sorted.length > 0) {
+      const q = leSearchState.q.trim().toLowerCase();
+      const activeSearch = q !== '';
+      const matchCount = sorted.filter(o => !q || o.name.toLowerCase().includes(q)).length;
+      toolbar = `
+        <div class="pt-toolbar">
+          <div class="pt-toolbar-left">
+            <div class="pt-search">
+              <i class="ti ti-search"></i>
+              <input type="text" placeholder="Search by name" value="${escapeHtml(leSearchState.q)}" oninput="onLeSearch(this.value)" />
+            </div>
+            ${activeSearch ? `<span class="pt-count">${matchCount} found</span>` : ''}
+          </div>
+          ${headerAddBtn}
+        </div>`;
+    }
+    if (toolbarEl) toolbarEl.innerHTML = toolbar;
+
+    const q = leSearchState.q.trim().toLowerCase();
+    const filtered = sorted.map((o, i) => ({ o, i })).filter(({ o }) => !q || o.name.toLowerCase().includes(q));
+
+    const header = `
+      <div class="cas-row2 cas-head">
+        <span class="toc-c-name">Name</span>
+        <span class="toc-c-role">Role</span>
+        <span class="toc-c-conn">Joined at</span>
+        <span class="toc-c-left">Left at</span>
+        <span class="cas-c-note">Note</span>
+        ${editing ? `<span class="cas-c-actions"></span>` : ''}
+      </div>`;
+
+    let body;
+    if (sorted.length > 0 && filtered.length === 0) {
+      body = `<div class="pt-empty">No results match your search.<button class="cas-empty-secondary" onclick="clearLeSearch()">Clear search</button></div>`;
+    } else {
+      body = filtered.map(({ o, i }) => {
+        const note = getLeNote(o);
+        const manualTag = o.manual ? ' <span class="row-marker manual">Manual</span>' : '';
+
+        if (isLeRemoved(o)) {
+          return `
+            <div class="cas-row2 removed">
+              <span class="toc-c-name">${escapeHtml(o.name)}${manualTag}</span>
+              <span class="toc-c-role">${escapeHtml(o.role)}</span>
+              <span class="toc-c-conn">${o.joinedAt || '—'}</span>
+              <span class="toc-c-left">${o.leftAt || '—'}</span>
+              <span class="cas-c-note"><span class="row-marker removed-tag">Removed</span> <span class="cas-removal-reason">${escapeHtml(getLeRemovalReason(o))}</span></span>
+              ${editing ? `<span class="cas-c-actions"><button class="drone-reached-btn link" onclick="undoLeRemove(${i})">Undo</button></span>` : ''}
+            </div>`;
+        }
+
+        if (editing && leEditRowOpen[i]) {
+          if (o.manual) {
+            return `
+              <div class="cas-add-form">
+                <div class="cas-add-fields">
+                  <div class="cas-field"><label class="cas-field-label">Name <span class="req">*</span></label><input class="cas-add-input" id="le-name-${i}" value="${escapeHtml(o.name)}" /></div>
+                  <div class="cas-field"><label class="cas-field-label">Role</label><input class="cas-add-input" value="Law Enforcement" disabled /></div>
+                  <div class="cas-field"><label class="cas-field-label">Joined at</label><input class="cas-add-input" value="—" disabled /></div>
+                </div>
+                <div class="cas-add-fields" style="margin-top:10px;">
+                  <div class="cas-field" style="flex:1;"><label class="cas-field-label">Note</label><input class="cas-add-input" id="le-note-${i}" value="${escapeHtml(note)}" style="width:100%;" /></div>
+                </div>
+                <div class="cas-add-actions">
+                  <button class="cas-add-btn" onclick="saveLeEdit(${i})">Save</button>
+                  <button class="cas-empty-secondary" onclick="cancelLeEdit(${i})">Cancel</button>
+                </div>
+              </div>`;
+          }
+          return `
+            <div class="cas-add-form">
+              <div class="cas-add-fields">
+                <div class="cas-field"><label class="cas-field-label">Name</label><input class="cas-add-input" value="${escapeHtml(o.name)}" disabled /></div>
+                <div class="cas-field"><label class="cas-field-label">Role</label><input class="cas-add-input" value="${escapeHtml(o.role)}" disabled /></div>
+                <div class="cas-field"><label class="cas-field-label">Joined at</label><input class="cas-add-input" value="${o.joinedAt}" disabled /></div>
+                <div class="cas-field"><label class="cas-field-label">Left at</label><input class="cas-add-input" value="${o.leftAt || '—'}" disabled /></div>
+              </div>
+              <div class="cas-add-fields" style="margin-top:10px;">
+                <div class="cas-field" style="flex:1;"><label class="cas-field-label">Note</label><input class="cas-add-input" id="le-note-${i}" value="${escapeHtml(note)}" style="width:100%;" /></div>
+              </div>
+              <div class="cas-add-actions">
+                <button class="cas-add-btn" onclick="saveLeEdit(${i})">Save</button>
+                <button class="cas-empty-secondary" onclick="cancelLeEdit(${i})">Cancel</button>
+              </div>
+            </div>`;
+        }
+
+        const noteOpen = !!leNoteOpen[i];
+        const noteTxt = note ? escapeHtml(note) : '<span style="color:var(--text-tertiary);">—</span>';
+        const noteCell = `<span class="cas-c-note ${noteOpen ? 'open' : ''}" onclick="toggleLeNote(${i})" title="${noteOpen ? 'Click to collapse' : 'Click to expand'}">${noteTxt}</span>`;
+
+        let actions = '';
+        if (editing) {
+          actions = `<span class="cas-c-actions">
+                 <button class="drone-edit-btn" onclick="startLeEdit(${i})" title="Edit"><i class="ti ti-pencil"></i></button>
+                 <button class="cas-remove-btn cas-trash" onclick="startLeRemove(${i})" title="Delete"><i class="ti ti-trash"></i></button>
+               </span>`;
+        }
+
+        return `
+          <div class="cas-row2">
+            <span class="toc-c-name">${escapeHtml(o.name)}${manualTag}</span>
+            <span class="toc-c-role">${escapeHtml(o.role)}</span>
+            <span class="toc-c-conn">${o.joinedAt || '—'}</span>
+            <span class="toc-c-left">${o.leftAt || '—'}</span>
+            ${noteCell}
+            ${actions}
+          </div>`;
+      }).join('');
+    }
+
+    let emptyBlock = '';
+    if (editing && sorted.length === 0 && !leAddFormOpen) {
+      emptyBlock = `<div class="cas-empty-state">
+           <p class="cas-empty-copy">No law enforcement officers recorded yet.</p>
+           <div class="cas-empty-actions"><button class="cas-empty-secondary" onclick="toggleLeAddForm()">Add person</button></div>
+         </div>`;
+    }
+
+    let addForm = '';
+    if (editing && leAddFormOpen) {
+      addForm = `
+        <div class="cas-add-form">
+          <div class="cas-add-fields">
+            <div class="cas-field"><label class="cas-field-label">Name <span class="req">*</span></label><input class="cas-add-input" id="le-add-name" placeholder="Full name" oninput="onLeAddInput()" /></div>
+            <div class="cas-field"><label class="cas-field-label">Role</label><input class="cas-add-input" value="Law Enforcement" disabled /></div>
+            <div class="cas-field"><label class="cas-field-label">Joined at</label><input class="cas-add-input" value="—" disabled /></div>
+          </div>
+          <div class="cas-add-fields" style="margin-top:10px;">
+            <div class="cas-field" style="flex:1;"><label class="cas-field-label">Note</label><input class="cas-add-input" id="le-add-note" placeholder="Note" style="width:100%;" /></div>
+          </div>
+          <div class="cas-add-actions">
+            <button class="cas-add-btn" id="le-add-btn" onclick="addOfficerRow()" disabled>Add person</button>
+            <button class="cas-empty-secondary" onclick="cancelLeAddForm()">Cancel</button>
+          </div>
+        </div>`;
+    }
+
+    host.innerHTML = `${header}${body}${emptyBlock}${addForm}`;
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  DRONE PILOT: DRONES — full parity with the PIA Admin Panel's Drones
+  //  table: same summary-row columns, same expand-panel detail, and the
+  //  same deterministic per-drone enrichment (type/payload/degradation/
+  //  latency), ported verbatim so the numbers match the Overview tab
+  //  exactly. Scoped to just Christian Van Sloun's own drones, matching the PIA
+  //  panel's own `personRole === 'Drone Pilot'` filter logic.
+  //
+  //  Editing here stays consistent with this file's own inline-edit
+  //  pattern (pencil icon → in-place form) rather than the PIA admin's
+  //  separate full-page "Edit Drone" editor — that's an admin tool this
+  //  standalone pilot-facing form doesn't have a use for. Of the fields
+  //  in the expand panel, only "Reached target", "Return condition", and
+  //  "Note" are pilot-editable here — matching the PIA panel's own framing
+  //  that Return condition is set by "a person physically checking the
+  //  drone box" (i.e. the pilot) and Note originates from the pilot's own
+  //  supplemental report. "Effect on threat" is an admin/analyst assessment field on
+  //  the PIA side with no seed data, so it stays unset here too — the
+  //  section simply doesn't render, exactly like a fresh, unanalyzed
+  //  incident looks in the PIA panel itself.
+  // ══════════════════════════════════════════════════════════════════════
+
+  // ── Deterministic per-drone enrichment (ported verbatim from the PIA Admin
+  // Panel so degradation/latency/type/payload values are bit-for-bit identical
+  // to the Overview tab) ──
+  function seedFromString(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+    return h;
+  }
+  function mulberry32(seed) {
+    return function () {
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function fmtClockFromSec(sec) {
+    sec = ((sec % 86400) + 86400) % 86400;
+    let h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    const ap = h >= 12 ? 'PM' : 'AM';
+    h = h % 12; if (h === 0) h = 12;
+    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')} ${ap}`;
+  }
+  function fmtDuration(sec) {
+    if (sec == null || sec < 0) return '—';
+    const h = Math.floor(sec / 3600), mn = Math.floor((sec % 3600) / 60), s = sec % 60;
+    return h > 0 ? `${h}h ${mn}m` : `${mn}m ${s.toString().padStart(2, '0')}s`;
+  }
+  function fmtHHMMSS(sec) {
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  }
+  function fmtPlusHHMM(sec) {
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+    return `+${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+  }
+  function computeDegDuration(startTimeStr, recallMode, recallTimeStr) {
+    if (recallMode !== 'recalled' || !recallTimeStr || !startTimeStr) return null;
+    const startSec = parseClock(startTimeStr);
+    const endSec = parseClock(recallTimeStr);
+    if (startSec == null || endSec == null) return null;
+    return fmtHHMMSS(Math.max(0, endSec - startSec));
+  }
+
+  const DRONE_TYPES = ['Stun grenade', 'Pepper grenade', 'Tear gas', 'Smoke', 'Stinger', 'Kinetic', 'Sonic', 'Pepper spray', 'Dazzler', 'BolaWrap', 'Glass breaker'];
+  const DRONE_BOX_LOCATIONS = [
+    { name: 'Roof Box A', boxId: 'BOX-A3' },
+    { name: 'Roof Box B', boxId: 'BOX-B1' },
+    { name: 'Mobile Unit 1', boxId: 'BOX-M1' },
+    { name: 'Mobile Unit 2', boxId: 'BOX-M2' },
+    { name: 'Hangar Bay 3', boxId: 'BOX-H3' },
+    { name: 'Perimeter Box C', boxId: 'BOX-C7' },
+  ];
+  const DRONE_PAYLOAD_TYPE = { Hummer: 'Surveillance', Shooter: 'Intervention', Debuffer: 'Disruption' };
+  const DRONE_PAYLOAD_MODULES = {
+    Hummer: ['Thermal Imaging Sensor Mk II', 'Wide-Angle Surveillance Camera', 'Long-Range Audio Pickup'],
+    Shooter: ['Non-Lethal Intervention Module', 'Flashbang Deployment Unit', 'Net Deployment Module'],
+    Debuffer: ['Signal Jamming Unit', 'Strobe Disorientation Unit', 'Smoke Deployment Unit'],
+  };
+  const DRONE_PAYLOAD_MODULES_DEFAULT = ['Standard Deployment Module', 'Munition Canister', 'Deployment Actuator'];
+  const DRONE_PAYLOAD_STATUSES = ['Nominal', 'Degraded', 'Depleted', 'Malfunction'];
+  const DRONE_RETURN_CONDITIONS = ['Returned intact', 'Minor damage', 'Major damage', 'Returned degraded', 'Maintenance required', 'Emergency return', 'Forced landing', 'Lost / not recovered', 'Unknown'];
+
+  function enrichDroneData(d, seedKey) {
+    const rnd = mulberry32(seedFromString(d.id + seedKey));
+    const pick = arr => arr[Math.floor(rnd() * arr.length)];
+
+    const type = pick(DRONE_TYPES);
+    const pilotId = 'P-' + (100 + Math.floor(rnd() * 900));
+    const boxPick = pick(DRONE_BOX_LOCATIONS);
+    const boxLocation = boxPick.name;
+    const boxId = boxPick.boxId;
+
+    const payloadType = DRONE_PAYLOAD_TYPE[type] || 'Munition';
+    const payloadModule = pick(DRONE_PAYLOAD_MODULES[type] || DRONE_PAYLOAD_MODULES_DEFAULT);
+    const payloadStatus = rnd() < 0.65 ? 'Nominal' : pick(DRONE_PAYLOAD_STATUSES.slice(1));
+    const payloadCapacity = 4 + Math.floor(rnd() * 5); // 4–8
+    const payloadUsageCount = Math.min(payloadCapacity, 1 + Math.floor(rnd() * payloadCapacity));
+    const payloadRemaining = payloadCapacity - payloadUsageCount;
+
+    const deploySec = parseClock(d.deployTime);
+    const arrivedInZoneSec = deploySec + 20 + Math.floor(rnd() * 40);
+    const estFirstEngagedSec = arrivedInZoneSec + 15 + Math.floor(rnd() * 45);
+    const endSec = d.recallTime ? parseClock(d.recallTime) : (d.batteryDiedTime ? parseClock(d.batteryDiedTime) : deploySec + 20 * 60);
+    const returnedSec = d.recallTime ? parseClock(d.recallTime) + 10 + Math.floor(rnd() * 30) : null;
+
+    const degRoll = rnd();
+    let degradation = null;
+    if (degRoll >= 0.55) {
+      const severity = degRoll < 0.75 ? 'Low' : (degRoll < 0.92 ? 'Medium' : 'High');
+      const span = Math.max(60, endSec - deploySec - 120);
+      const afterDeploySec = 60 + Math.floor(rnd() * span);
+      const startSec = deploySec + afterDeploySec;
+      const durSec = 60 + Math.floor(rnd() * 400);
+      degradation = { severity, startSec, afterDeploySec, durSec };
+    }
+
+    let latency = null;
+    {
+      const hasDeg = !!degradation;
+      const baseChance = hasDeg ? (degradation.severity === 'High' ? 0.75 : degradation.severity === 'Medium' ? 0.55 : 0.35) : 0.12;
+      if (rnd() < baseChance) {
+        if (hasDeg && degradation.severity === 'High' && rnd() < 0.25) {
+          latency = { severity: 'Unavailable', afterDeploySec: null };
+        } else {
+          const sev = rnd() < (hasDeg ? 0.55 : 0.3) ? 'High' : 'Elevated';
+          const afterDeploySec = hasDeg
+            ? Math.max(0, degradation.afterDeploySec - 10 - Math.floor(rnd() * 40))
+            : 30 + Math.floor(rnd() * Math.max(60, endSec - deploySec - 60));
+          latency = { severity: sev, afterDeploySec };
+        }
+      }
+    }
+
+    const engagementCount = 1 + Math.floor(rnd() * 5);
+    const returnCondition = 'Unknown'; // always starts Unknown — only a person physically checking the drone box can set this
+
+    return {
+      ...d,
+      type, pilotId, boxLocation, boxId,
+      payloadType, payloadModule, payloadStatus, payloadCapacity, payloadUsageCount, payloadRemaining,
+      arrivedInZone: fmtClockFromSec(arrivedInZoneSec),
+      returned: returnedSec != null ? fmtClockFromSec(returnedSec) : null,
+      degradation, latency, engagementCount, returnCondition,
+    };
+  }
+
+  // Full 17-drone fleet, same seed rows as the PIA panel's droneAssetData. Christian Van
+  // Sloun's 5 (previously "Victor Huang" before our roster rename) keep the renamed pilot
+  // value; the other 12 (Grace Lin, Omar Farah, Tyler Brooks) were never renamed since
+  // they're not tracked as TOC_MEMBERS in this prototype. Drone Pilot sees only their own;
+  // Chief Drone Pilot sees the full fleet — see droneList() below.
+  const droneAssetDataAll = [
+    { id: 'DRN-4471', pilot: 'Christian Van Sloun', deployTime: '01:14:05 PM', recallTime: '02:10:00 PM', batteryDied: false },
+    { id: 'DRN-4472', pilot: 'Christian Van Sloun', deployTime: '01:20:15 PM', recallTime: null, batteryDied: true, batteryDiedTime: '01:38:03 PM' },
+    { id: 'DRN-4473', pilot: 'Grace Lin', deployTime: '01:12:40 PM', recallTime: '02:02:15 PM', batteryDied: false },
+    { id: 'DRN-4474', pilot: 'Omar Farah', deployTime: '01:15:10 PM', recallTime: '02:06:40 PM', batteryDied: false },
+    { id: 'DRN-4475', pilot: 'Tyler Brooks', deployTime: '01:17:22 PM', recallTime: null, batteryDied: true, batteryDiedTime: '01:41:22 PM' },
+    { id: 'DRN-4476', pilot: 'Christian Van Sloun', deployTime: '01:19:05 PM', recallTime: '02:14:20 PM', batteryDied: false },
+    { id: 'DRN-4477', pilot: 'Grace Lin', deployTime: '01:22:48 PM', recallTime: '02:18:05 PM', batteryDied: false },
+    { id: 'DRN-4478', pilot: 'Omar Farah', deployTime: '01:24:15 PM', recallTime: null, batteryDied: true, batteryDiedTime: '01:46:10 PM' },
+    { id: 'DRN-4479', pilot: 'Tyler Brooks', deployTime: '01:27:30 PM', recallTime: '02:25:52 PM', batteryDied: false },
+    { id: 'DRN-4480', pilot: 'Christian Van Sloun', deployTime: '01:30:02 PM', recallTime: '02:30:11 PM', batteryDied: false },
+    { id: 'DRN-4481', pilot: 'Grace Lin', deployTime: '01:33:19 PM', recallTime: '02:34:48 PM', batteryDied: false },
+    { id: 'DRN-4482', pilot: 'Omar Farah', deployTime: '01:36:44 PM', recallTime: null, batteryDied: true, batteryDiedTime: '02:03:55 PM' },
+    { id: 'DRN-4483', pilot: 'Tyler Brooks', deployTime: '01:39:08 PM', recallTime: '02:41:03 PM', batteryDied: false },
+    { id: 'DRN-4484', pilot: 'Christian Van Sloun', deployTime: '01:42:51 PM', recallTime: '02:45:29 PM', batteryDied: false },
+    { id: 'DRN-4485', pilot: 'Grace Lin', deployTime: '01:46:03 PM', recallTime: '02:50:00 PM', batteryDied: false },
+    { id: 'DRN-4486', pilot: 'Omar Farah', deployTime: '01:49:37 PM', recallTime: null, batteryDied: true, batteryDiedTime: '02:22:31 PM' },
+    { id: 'DRN-4487', pilot: 'Tyler Brooks', deployTime: '01:52:10 PM', recallTime: '02:58:44 PM', batteryDied: false },
+  ];
+  const droneAssetData = droneAssetDataAll.map(d => enrichDroneData(d, '-ref'));
+
+  let droneReachedTarget = {}; // id -> { mode: 'time' | 'noEngage', time? }
+  let droneNotes = {};
+  let droneReturnCondition = {};
+  let droneRemovals = {};
+  let manualDrones = [];
+  const droneSearchState = { q: '' };
+  const droneEditRowOpen = {};
+  let droneAddFormOpen = false;
+  let droneRemoveTargetIndex = null;
+
+  // Regular Drone Pilot only ever sees their own drones (Christian Van Sloun); every other
+  // role — Chief Drone Pilot included — sees the entire fleet, since they're not the ones
+  // flying and need the full picture of drone assets used in the incident.
+  function droneList() {
+    const showFullFleet = currentRole !== 'Drone Pilot';
+    const basePool = showFullFleet ? droneAssetData : droneAssetData.filter(d => d.pilot === 'Christian Van Sloun');
+    const manualPool = showFullFleet ? manualDrones : manualDrones.filter(d => d.pilot === 'Christian Van Sloun');
+    const sortKey = d => {
+      const dep = parseClock(d.deployTime);
+      if (dep != null) return dep;
+      return Infinity;
+    };
+    return [...basePool, ...manualPool].sort((a, b) => sortKey(a) - sortKey(b));
+  }
+  function getDroneReached(d) { return d.manual ? d.reached : droneReachedTarget[d.id]; } // { mode, time? } | undefined
+  function getDroneNote(d) { return d.manual ? (d.note || '') : (droneNotes[d.id] || ''); }
+  function getDroneReturnCondition(d) { return d.manual ? (d.returnCondition || 'Unknown') : (droneReturnCondition[d.id] || d.returnCondition || 'Unknown'); }
+  function isDroneRemoved(d) { return d.manual ? !!d.removed : !!droneRemovals[d.id]; }
+  function getDroneRemovalReason(d) { return d.manual ? (d.removalReason || '') : (droneRemovals[d.id] || ''); }
+
+  function onDroneSearch(val) {
+    droneSearchState.q = val;
+    renderDroneTable();
+    const el = document.querySelector('#drone-toolbar .pt-search input');
+    if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+  }
+  function clearDroneSearch() { droneSearchState.q = ''; renderDroneTable(); }
+
+  function startDroneEdit(i) {
+    Object.keys(droneEditRowOpen).forEach(k => delete droneEditRowOpen[k]);
+    droneEditRowOpen[i] = true;
+    renderDroneTable();
+  }
+  function cancelDroneEdit(i) { delete droneEditRowOpen[i]; renderDroneTable(); }
+  function onDroneReachedModeChange(i) {
+    const mode = document.querySelector(`input[name="drone-reached-mode-${i}"]:checked`).value;
+    const timeWrap = document.getElementById(`drone-reached-time-wrap-${i}`);
+    if (timeWrap) timeWrap.style.display = mode === 'time' ? '' : 'none';
+  }
+  function saveDroneEdit(i) {
+    const drone = droneList()[i];
+    if (!drone) return;
+    const mode = document.querySelector(`input[name="drone-reached-mode-${i}"]:checked`).value;
+    let reached;
+    if (mode === 'time') {
+      const time = getTimeMaskValue('drone-reached-' + i);
+      if (!time) return;
+      reached = { mode: 'time', time };
+    } else {
+      reached = { mode: 'noEngage' };
+    }
+    const returnCond = document.getElementById(`drone-return-${i}`).value;
+    const noteEl = document.getElementById(`drone-note-${i}`);
+    const noteVal = noteEl ? noteEl.value : '';
+    if (drone.manual) {
+      const idEl = document.getElementById(`drone-id-${i}`);
+      const id = idEl ? idEl.value.trim() : drone.id;
+      if (!id) return;
+      drone.id = id;
+      drone.reached = reached;
+      drone.returnCondition = returnCond;
+      drone.note = noteVal;
+    } else {
+      droneReachedTarget[drone.id] = reached;
+      droneReturnCondition[drone.id] = returnCond;
+      droneNotes[drone.id] = noteVal;
+    }
+    delete droneEditRowOpen[i];
+    clearSectionConfirmation("main");
+    renderDroneTable();
+  }
+
+  function toggleDroneAddForm() {
+    droneAddFormOpen = !droneAddFormOpen;
+    if (droneAddFormOpen) Object.keys(droneEditRowOpen).forEach(k => delete droneEditRowOpen[k]);
+    renderDroneTable();
+    if (droneAddFormOpen) { const el = document.getElementById('drone-add-id'); if (el) el.focus(); }
+  }
+  function cancelDroneAddForm() { droneAddFormOpen = false; renderDroneTable(); }
+  function onDroneAddInput() {
+    const id = (document.getElementById('drone-add-id').value || '').trim();
+    const btn = document.getElementById('drone-add-btn');
+    if (btn) btn.disabled = !id;
+  }
+  function onDroneAddReachedModeChange() {
+    const mode = document.querySelector('input[name="drone-add-reached-mode"]:checked').value;
+    const timeWrap = document.getElementById('drone-add-reached-time-wrap');
+    if (timeWrap) timeWrap.style.display = mode === 'time' ? '' : 'none';
+  }
+  function addDroneRow() {
+    const id = (document.getElementById('drone-add-id').value || '').trim();
+    if (!id) return;
+    const mode = document.querySelector('input[name="drone-add-reached-mode"]:checked').value;
+    let reached;
+    if (mode === 'time') {
+      const time = getTimeMaskValue('drone-add-reached');
+      if (!time) return;
+      reached = { mode: 'time', time };
+    } else {
+      reached = { mode: 'noEngage' };
+    }
+    const returnCond = document.getElementById('drone-add-return').value;
+    const noteEl = document.getElementById('drone-add-note');
+    const note = noteEl ? noteEl.value.trim() : '';
+    const pilotName = document.getElementById('info-name').textContent;
+    manualDrones.push({ id, pilot: pilotName, deployTime: null, recallTime: null, batteryDied: false, reached, returnCondition: returnCond, note, manual: true, removed: false, removalReason: '' });
+    droneAddFormOpen = false;
+    droneSearchState.q = '';
+    Object.keys(droneEditRowOpen).forEach(k => delete droneEditRowOpen[k]);
+    clearSectionConfirmation("main");
+    renderDroneTable();
+  }
+
+  function startDroneRemove(i) {
+    const drone = droneList()[i];
+    if (!drone) return;
+    droneRemoveTargetIndex = i;
+    document.getElementById('drone-remove-modal-body').innerHTML =
+      `Remove <b>${escapeHtml(drone.id)}</b> from this incident's drone log? This changes the recorded deployment data on a report that may be used as an official record. The entry stays visible, marked as removed with your reason.`;
+    const reasonEl = document.getElementById('drone-remove-reason');
+    reasonEl.value = '';
+    updateDroneRemoveConfirmState();
+    document.getElementById('drone-remove-overlay').classList.add('open');
+    setTimeout(() => reasonEl.focus(), 50);
+  }
+  function updateDroneRemoveConfirmState() {
+    const btn = document.getElementById('drone-remove-confirm');
+    const el = document.getElementById('drone-remove-reason');
+    if (btn) btn.disabled = !(el && el.value.trim());
+  }
+  function cancelDroneRemoveModal() {
+    droneRemoveTargetIndex = null;
+    document.getElementById('drone-remove-overlay').classList.remove('open');
+  }
+  function closeDroneRemoveModalOnOverlay(e) {
+    if (e.target.id === 'drone-remove-overlay') cancelDroneRemoveModal();
+  }
+  function confirmDroneRemoveModal() {
+    const reason = document.getElementById('drone-remove-reason').value.trim();
+    if (!reason) return;
+    const drone = droneList()[droneRemoveTargetIndex];
+    if (drone) {
+      if (drone.manual) { drone.removed = true; drone.removalReason = reason; }
+      else { droneRemovals[drone.id] = reason; }
+    }
+    document.getElementById('drone-remove-overlay').classList.remove('open');
+    droneRemoveTargetIndex = null;
+    clearSectionConfirmation("main");
+    renderDroneTable();
+  }
+  function undoDroneRemove(i) {
+    const drone = droneList()[i];
+    if (!drone) return;
+    if (drone.manual) { drone.removed = false; drone.removalReason = ''; }
+    else { delete droneRemovals[drone.id]; }
+    clearSectionConfirmation("main");
+    renderDroneTable();
+  }
+
+  // ── Expand panel: same structure/fields as the PIA Admin Panel's review-mode
+  // expand panel (Drone identity, Payload, Return, Degradation, Latency, plus
+  // Effect on threat / Note if present). Manual (pilot-added) drones skip the
+  // Payload/Degradation/Latency sections since there's no seed data to derive
+  // them from. ──
+  function droneExpandPanelHtml(d, i) {
+    const reached = getDroneReached(d);
+    const isDroneResponsible = currentRole === 'Drone Pilot' || currentRole === 'Chief Drone Pilot';
+    const reachedBadge = !isDroneResponsible
+      ? '–'
+      : (reached == null
+        ? `<span class="drone-missing-badge">Missing</span>`
+        : (reached.mode === 'time' ? reached.time : 'Did not engage'));
+    const returnCondition = getDroneReturnCondition(d);
+    const note = getDroneNote(d);
+
+    const identityFields = `
+      <div class="drone-expand-field"><span class="k">Drone ID</span><span class="v">${escapeHtml(d.id)}</span></div>
+      ${!d.manual ? `<div class="drone-expand-field"><span class="k">Type</span><span class="v"><span class="drone-type-badge">${escapeHtml(d.type)}</span></span></div>` : ''}
+      <div class="drone-expand-field"><span class="k">Pilot</span><span class="v">${escapeHtml(d.pilot)}</span></div>
+      ${!d.manual ? `<div class="drone-expand-field"><span class="k">Box ID</span><span class="v">${escapeHtml(d.boxId)}</span></div>` : ''}
+    `;
+
+    const payloadHtml = d.manual ? '' : `
+      <div class="drone-expand-section-title">Payload</div>
+      <div class="drone-expand-field"><span class="k">Payload type</span><span class="v">${escapeHtml(d.payloadType)}</span></div>
+      <div class="drone-expand-field"><span class="k">Payload module</span><span class="v">${escapeHtml(d.payloadModule)}</span></div>
+      <div class="drone-expand-field"><span class="k">Payload status</span><span class="v">${escapeHtml(d.payloadStatus)}</span></div>
+      <div class="drone-expand-field"><span class="k">Payload usage count</span><span class="v">${d.payloadUsageCount}</span></div>
+      <div class="drone-expand-field"><span class="k">Payload remaining</span><span class="v">${d.payloadRemaining} of ${d.payloadCapacity}</span></div>
+    `;
+
+    let degradationHtml = '';
+    let latencyHtml = '';
+    if (!d.manual) {
+      const dSeverity = d.degradation ? d.degradation.severity : 'None';
+      degradationHtml = d.degradation ? `
+        <div class="drone-expand-field"><span class="k">Severity</span><span class="v">${d.degradation.severity}</span></div>
+        <div class="drone-expand-field"><span class="k">Start time</span><span class="v">${fmtClockFromSec(d.degradation.startSec)}</span></div>
+        <div class="drone-expand-field"><span class="k">After deployment</span><span class="v">${fmtPlusHHMM(d.degradation.afterDeploySec)}</span></div>
+        <div class="drone-expand-field"><span class="k">Duration</span><span class="v">${computeDegDuration(fmtClockFromSec(d.degradation.startSec), d.batteryDied ? 'batteryDied' : 'recalled', d.recallTime) || '—'}</span></div>
+      ` : `<div class="drone-expand-field"><span class="k">Severity</span><span class="v">None</span></div>`;
+
+      latencyHtml = !d.latency
+        ? `<div class="drone-expand-field"><span class="k">Severity</span><span class="v">Normal</span></div>`
+        : d.latency.severity === 'Unavailable'
+          ? `<div class="drone-expand-field"><span class="k">Severity</span><span class="v">Data unavailable</span></div>`
+          : `
+            <div class="drone-expand-field"><span class="k">Severity</span><span class="v">${d.latency.severity}</span></div>
+            <div class="drone-expand-field"><span class="k">Started</span><span class="v">${fmtPlusHHMM(d.latency.afterDeploySec)}</span></div>
+          `;
+    }
+
+    const notesSectionHtml = note
+      ? `<div class="drone-expand-section-title" style="margin-top:0;">Note</div><div class="drone-notes-block">${escapeHtml(note)}</div>`
+      : '';
+
+    return `
+      <div class="drone-expand-panel">
+        <div class="drone-expand-grid drone-expand-grid-divided">
+          <div>
+            <div class="drone-expand-section-title" style="margin-top:0;">Drone identity</div>
+            ${identityFields}
+            ${payloadHtml}
+          </div>
+          <div>
+            <div class="drone-expand-section-title" style="margin-top:0;">Return</div>
+            <div class="drone-expand-field"><span class="k">First engaged / reached target</span><span class="v">${reachedBadge}</span></div>
+            <div class="drone-expand-field"><span class="k">Return condition</span><span class="v">${escapeHtml(returnCondition)}</span></div>
+            ${!d.manual ? `<div class="drone-expand-section-title">Degradation</div>${degradationHtml}<div class="drone-expand-section-title">Latency</div>${latencyHtml}` : ''}
+          </div>
+        </div>
+        ${notesSectionHtml ? `<div class="drone-expand-divider"></div>${notesSectionHtml}` : ''}
+      </div>`;
+  }
+
+  function droneEditFormHtml(d, i) {
+    const reached = getDroneReached(d);
+    const mode = reached ? reached.mode : 'time';
+    const returnCondition = getDroneReturnCondition(d);
+    const note = getDroneNote(d);
+    const returnOpts = DRONE_RETURN_CONDITIONS.map(c => `<option value="${c}" ${c === returnCondition ? 'selected' : ''}>${c}</option>`).join('');
+    const idField = d.manual
+      ? `<div class="cas-field"><label class="cas-field-label">Drone ID <span class="req">*</span></label><input class="cas-add-input" id="drone-id-${i}" value="${escapeHtml(d.id)}" /></div>`
+      : `<div class="cas-field"><label class="cas-field-label">Drone ID</label><input class="cas-add-input" value="${escapeHtml(d.id)}" disabled /></div>`;
+    return `
+      <div class="cas-add-form">
+        <div class="cas-add-fields">
+          ${idField}
+          <div class="cas-field">
+            <label class="cas-field-label">Reached target <span class="req">*</span></label>
+            <div style="display:flex;gap:14px;align-items:center;height:33px;">
+              <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;"><input type="radio" name="drone-reached-mode-${i}" value="time" ${mode === 'time' ? 'checked' : ''} onchange="onDroneReachedModeChange(${i})"> Time</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;"><input type="radio" name="drone-reached-mode-${i}" value="noEngage" ${mode === 'noEngage' ? 'checked' : ''} onchange="onDroneReachedModeChange(${i})"> Did not engage</label>
+            </div>
+          </div>
+          <div class="cas-field" id="drone-reached-time-wrap-${i}" style="${mode === 'time' ? '' : 'display:none;'}">
+            <label class="cas-field-label">Time</label>
+            ${renderTimeMaskHtml('drone-reached-' + i, mode === 'time' && reached ? reached.time : '')}
+          </div>
+        </div>
+        <div class="cas-add-fields" style="margin-top:10px;">
+          <div class="cas-field"><label class="cas-field-label">Return condition</label><select class="cas-add-select" id="drone-return-${i}">${returnOpts}</select></div>
+          <div class="cas-field" style="flex:1;"><label class="cas-field-label">Note</label><input class="cas-add-input" id="drone-note-${i}" value="${note ? escapeHtml(note) : ''}" style="width:100%;" /></div>
+        </div>
+        <div class="cas-add-actions">
+          <button class="cas-add-btn" onclick="saveDroneEdit(${i})">Save</button>
+          <button class="cas-empty-secondary" onclick="cancelDroneEdit(${i})">Cancel</button>
+        </div>
+      </div>`;
+  }
+
+  function renderDroneTable() {
+    const toolbarEl = document.getElementById('drone-toolbar');
+    const host = document.getElementById('drone-table-host');
+    if (!host) return;
+    checkFormValid();
+    updateSaveEditValid();
+    const editing = !formLocked || editModeActive;
+    const sorted = droneList();
+    const isDroneResponsible = currentRole === 'Drone Pilot' || currentRole === 'Chief Drone Pilot';
+    const dronesTab = document.getElementById('assets-tab-drones');
+    if (dronesTab) dronesTab.textContent = `Drones (${sorted.filter(d => !isDroneRemoved(d)).length})`;
+
+    const headerAddBtn = (editing && sorted.length > 0)
+      ? `<button class="cas-add-toggle" onclick="toggleDroneAddForm()"><i class="ti ti-plus"></i> Add drone</button>`
+      : '';
+
+    let toolbar = '';
+    if (sorted.length > 0) {
+      const q = droneSearchState.q.trim().toLowerCase();
+      const activeSearch = q !== '';
+      const matchCount = sorted.filter(d => !q || d.id.toLowerCase().includes(q)).length;
+      toolbar = `
+        <div class="pt-toolbar">
+          <div class="pt-toolbar-left">
+            <div class="pt-search">
+              <i class="ti ti-search"></i>
+              <input type="text" placeholder="Search by drone ID" value="${escapeHtml(droneSearchState.q)}" oninput="onDroneSearch(this.value)" />
+            </div>
+            ${activeSearch ? `<span class="pt-count">${matchCount} found</span>` : ''}
+          </div>
+          ${headerAddBtn}
+        </div>`;
+    }
+    if (toolbarEl) toolbarEl.innerHTML = toolbar;
+
+    const q = droneSearchState.q.trim().toLowerCase();
+    const filtered = sorted.map((d, i) => ({ d, i })).filter(({ d }) => !q || d.id.toLowerCase().includes(q));
+
+    const header = `
+      <div class="cas-row2 cas-head">
+        <span class="dr-c-drone-col">Drone / pilot</span>
+        <span class="dr-c-deployed-col">Deployed at</span>
+        <span class="dr-c-recalled-col">Recalled at</span>
+        <span class="dr-c-reached">First engaged</span>
+        <span class="dr-c-reached">Flight time</span>
+        <span class="dr-c-reached">Time to engage</span>
+        ${editing ? `<span class="cas-c-actions"></span>` : ''}
+      </div>`;
+
+    function recalledCell(d) {
+      if (d.batteryDied) return `<span class="drone-battery-pill">Battery died</span>`;
+      return d.recallTime || 'Not recalled';
+    }
+    function flightTimeStr(d) {
+      const deploySec = parseClock(d.deployTime);
+      if (deploySec == null) return '—';
+      const endStr = d.recallTime || (d.batteryDied ? d.batteryDiedTime : null);
+      if (!endStr) return '—';
+      return fmtDuration(parseClock(endStr) - deploySec);
+    }
+    function timeToEngageStr(d, reached) {
+      const deploySec = parseClock(d.deployTime);
+      if (deploySec == null || !reached || reached.mode !== 'time') return '—';
+      return fmtDuration(parseClock(reached.time) - deploySec);
+    }
+
+    let body;
+    if (sorted.length > 0 && filtered.length === 0) {
+      body = `<div class="pt-empty">No results match your search.<button class="cas-empty-secondary" onclick="clearDroneSearch()">Clear search</button></div>`;
+    } else {
+      body = filtered.map(({ d, i }) => {
+        const reached = getDroneReached(d);
+        const manualTag = d.manual ? ' <span class="row-marker manual">Manual</span>' : '';
+
+        if (isDroneRemoved(d)) {
+          return `
+            <div class="cas-row2 removed">
+              <span class="dr-c-drone-col">${escapeHtml(d.id)}${manualTag}</span>
+              <span class="dr-c-deployed-col">${d.deployTime || '—'}</span>
+              <span class="dr-c-recalled-col">${d.recallTime || '—'}</span>
+              <span class="dr-c-reached">${reached ? (reached.mode === 'time' ? reached.time : 'Did not engage') : '—'}</span>
+              <span class="dr-c-reached">—</span>
+              <span class="dr-c-reached" style="display:flex;align-items:center;gap:6px;"><span class="row-marker removed-tag">Removed</span> <span class="cas-removal-reason">${escapeHtml(getDroneRemovalReason(d))}</span></span>
+              ${editing ? `<span class="cas-c-actions"><button class="drone-reached-btn link" onclick="undoDroneRemove(${i})">Undo</button></span>` : ''}
+            </div>`;
+        }
+
+        if (editing && droneEditRowOpen[i]) {
+          return droneEditFormHtml(d, i);
+        }
+
+        let actions = '';
+        if (editing) {
+          actions = `<span class="cas-c-actions">
+                 <button class="drone-edit-btn" onclick="startDroneEdit(${i})" title="Edit"><i class="ti ti-pencil"></i></button>
+                 <button class="cas-remove-btn cas-trash" onclick="startDroneRemove(${i})" title="Delete"><i class="ti ti-trash"></i></button>
+               </span>`;
+        }
+
+        const summaryRow = `
+          <div class="cas-row2">
+            <span class="dr-c-drone-col"><div class="drone-identity-text"><div class="drone-id-line">${!d.manual ? `<span class="drone-type-badge">${escapeHtml(d.type)}</span> ` : ''}<span class="drone-id">${escapeHtml(d.id)}</span>${manualTag}</div><div class="drone-pilot-line">Pilot ${escapeHtml(d.pilot)}</div></div></span>
+            <span class="dr-c-deployed-col">${d.deployTime || '—'}</span>
+            <span class="dr-c-recalled-col">${recalledCell(d)}</span>
+            <span class="dr-c-reached">${!isDroneResponsible ? '–' : (reached == null ? '<span class="drone-missing-badge">Missing</span>' : (reached.mode === 'time' ? reached.time : 'Did not engage'))}</span>
+            <span class="dr-c-reached">${flightTimeStr(d)}</span>
+            <span class="dr-c-reached">${timeToEngageStr(d, reached)}</span>
+            ${actions}
+          </div>`;
+
+        return summaryRow + droneExpandPanelHtml(d, i);
+      }).join('');
+    }
+
+    let emptyBlock = '';
+    if (editing && sorted.length === 0 && !droneAddFormOpen) {
+      emptyBlock = `<div class="cas-empty-state">
+           <p class="cas-empty-copy">No drones recorded yet.</p>
+           <div class="cas-empty-actions"><button class="cas-empty-secondary" onclick="toggleDroneAddForm()">Add drone</button></div>
+         </div>`;
+    }
+
+    let addForm = '';
+    if (editing && droneAddFormOpen) {
+      const returnOpts = DRONE_RETURN_CONDITIONS.map(c => `<option value="${c}" ${c === 'Unknown' ? 'selected' : ''}>${c}</option>`).join('');
+      addForm = `
+        <div class="cas-add-form">
+          <div class="cas-add-fields">
+            <div class="cas-field"><label class="cas-field-label">Drone ID <span class="req">*</span></label><input class="cas-add-input" id="drone-add-id" placeholder="DRN-XXXX" oninput="onDroneAddInput()" /></div>
+            <div class="cas-field">
+              <label class="cas-field-label">Reached target <span class="req">*</span></label>
+              <div style="display:flex;gap:14px;align-items:center;height:33px;">
+                <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;"><input type="radio" name="drone-add-reached-mode" value="time" checked onchange="onDroneAddReachedModeChange()"> Time</label>
+                <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;"><input type="radio" name="drone-add-reached-mode" value="noEngage" onchange="onDroneAddReachedModeChange()"> Did not engage</label>
+              </div>
+            </div>
+            <div class="cas-field" id="drone-add-reached-time-wrap"><label class="cas-field-label">Time</label>${renderTimeMaskHtml('drone-add-reached', '')}</div>
+          </div>
+          <div class="cas-add-fields" style="margin-top:10px;">
+            <div class="cas-field"><label class="cas-field-label">Return condition</label><select class="cas-add-select" id="drone-add-return">${returnOpts}</select></div>
+            <div class="cas-field" style="flex:1;"><label class="cas-field-label">Note</label><input class="cas-add-input" id="drone-add-note" placeholder="Note" style="width:100%;" /></div>
+          </div>
+          <div class="cas-add-actions">
+            <button class="cas-add-btn" id="drone-add-btn" onclick="addDroneRow()" disabled>Add drone</button>
+            <button class="cas-empty-secondary" onclick="cancelDroneAddForm()">Cancel</button>
+          </div>
+        </div>`;
+    }
+
+    const responsibilityNote = isDroneResponsible ? '' : `<p class="cas-empty-copy" style="margin-bottom:10px;">Drone data completion is the responsibility of Drone Pilot / Chief Drone Pilot.</p>`;
+    host.innerHTML = `${responsibilityNote}${header}${body}${emptyBlock}${addForm}`;
+  }
+
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  MEDICAL: CASUALTIES — mirrors the PIA Admin Panel's Casualties schema
+  //  exactly (three categories: Minor injury / Life-threatening injury /
+  //  Fatalities; row fields Name, Role, Recorded, Note). Seeded from the
+  //  same INC-1042 data the PIA prototype derives from its Event Log, so
+  //  both prototypes tell the same story.
+  // ══════════════════════════════════════════════════════════════════════
+  const CAS_TYPES = ['minor', 'severe', 'fatality'];
+  const CAS_TITLES = { minor: 'Minor injury', severe: 'Life-threatening injury', fatality: 'Fatalities' };
+  const ROLE_OPTIONS = ['Staff', 'Law Enforcement', 'Other'];
+
+  const casualtySeed = {
+    minor: [
+      { name: 'Nora Bishop',    role: 'Staff',           recordedAt: '01:12:10 PM' },
+      { name: 'Felix Grant',    role: 'Staff',           recordedAt: '01:14:35 PM' },
+      { name: 'Ivy Coleman',    role: 'Law Enforcement', recordedAt: '01:19:48 PM' },
+      { name: 'Hugo Delgado',   role: 'Staff',           recordedAt: '01:23:02 PM' },
+      { name: 'Rex Palmer',     role: 'Staff',           recordedAt: '01:26:57 PM' },
+      { name: 'Ada Whitfield',  role: 'Staff',           recordedAt: '01:29:14 PM' },
+      { name: 'Noel Sanders',   role: 'Law Enforcement', recordedAt: '01:34:26 PM' },
+      { name: 'Perry Lambert',  role: 'Staff',           recordedAt: '01:37:03 PM' },
+      { name: 'River Osei',     role: 'Staff',           recordedAt: '01:40:19 PM' },
+      { name: 'Sage Whitman',   role: 'Staff',           recordedAt: '01:43:47 PM' },
+      { name: 'Gwen Pruitt',    role: 'Staff',           recordedAt: '01:47:32 PM' },
+      { name: 'Harley Voss',    role: 'Staff',           recordedAt: '01:52:08 PM' },
+      { name: 'Marlowe Quinn',  role: 'Staff',           recordedAt: '01:54:33 PM' },
+      { name: 'Desmond Ashby',  role: 'Staff',           recordedAt: '01:57:10 PM' },
+      { name: 'Rosalind Kerr',  role: 'Law Enforcement', recordedAt: '02:00:45 PM' },
+    ],
+    severe: [
+      { name: 'Blair Kingston',   role: 'Staff',           recordedAt: '01:17:41 PM' },
+      { name: 'Drew Castillo',    role: 'Law Enforcement', recordedAt: '01:21:55 PM' },
+      { name: 'Eden Marchetti',   role: 'Staff',           recordedAt: '01:31:38 PM' },
+      { name: 'Priscilla Wynn',   role: 'Staff',           recordedAt: '01:36:52 PM' },
+      { name: 'Flynn Ashworth',   role: 'Staff',           recordedAt: '01:45:20 PM' },
+    ],
+  };
+  function makeCasualtyRows(list) { return list.map(p => ({ ...p, manual: false, note: '', removed: false, removalReason: '' })); }
+  let casualtyReport = {
+    minor:    { rows: makeCasualtyRows(casualtySeed.minor) },
+    severe:   { rows: makeCasualtyRows(casualtySeed.severe) },
+    fatality: { rows: [], affirmedZero: false, affirmedBy: null, affirmedAt: null, count: null, details: '', reportedBy: null, reportedAt: null },
+  };
+
+  // ── Tabs: only the active casualty type's table is shown ──
+  let casActiveTab = 'minor';
+  function setCasTab(type) {
+    casActiveTab = type;
+    renderCasualtiesSection();
+  }
+
+  const casSearchState = { minor: { q: '', role: '' }, severe: { q: '', role: '' }, fatality: { q: '', role: '' } };
+  const casNoteOpen = {};      // key `${type}-${i}` -> bool
+  const casEditRowOpen = {};   // key `${type}-${i}` -> bool
+  const casAddFormOpen = { minor: false, severe: false, fatality: false };
+  let casRemoveTarget = null;  // { type, index }
+  let fatalityReportFormOpen = false; // shows the count + details inputs
+  let fatalityReportEditing = false;  // editing an already-reported (nonzero) fatality entry
+
+  function casActiveRows(type) { return casualtyReport[type].rows.filter(r => !r.removed); }
+  // Fatalities is resolved either by affirming zero, or by a saved nonzero report (count + details).
+  function fatalityResolved() {
+    return casualtyReport.fatality.affirmedZero ||
+      (casualtyReport.fatality.count != null && casualtyReport.fatality.count > 0 && !!casualtyReport.fatality.details);
+  }
+  function nowStamp() {
+    return new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true }).replace(',', '');
+  }
+  function currentMemberName() {
+    const el = document.getElementById('info-name');
+    return el ? el.textContent : '';
+  }
+
+  function toggleCasAddForm(type) {
+    casAddFormOpen[type] = !casAddFormOpen[type];
+    if (casAddFormOpen[type]) Object.keys(casEditRowOpen).forEach(k => delete casEditRowOpen[k]);
+    renderCasualtiesSection();
+    if (casAddFormOpen[type]) { const el = document.getElementById('cas-add-name-' + type); if (el) el.focus(); }
+  }
+  function cancelCasAddForm(type) { casAddFormOpen[type] = false; renderCasualtiesSection(); }
+  function onCasAddInput(type) {
+    const name = (document.getElementById('cas-add-name-' + type).value || '').trim();
+    const role = document.getElementById('cas-add-role-' + type).value;
+    const btn = document.getElementById('cas-add-btn-' + type);
+    if (btn) btn.disabled = !(name && role);
+  }
+  function addCasualtyRow(type) {
+    const nameEl = document.getElementById('cas-add-name-' + type);
+    const roleEl = document.getElementById('cas-add-role-' + type);
+    const noteEl = document.getElementById('cas-add-note-' + type);
+    const name = (nameEl.value || '').trim();
+    const role = roleEl.value;
+    if (!name || !role) return;
+    const note = noteEl ? noteEl.value.trim() : '';
+    casualtyReport[type].rows.push({ name, role, recordedAt: null, manual: true, note, removed: false, removalReason: '' });
+    if (type === 'fatality') { casualtyReport.fatality.affirmedZero = false; casualtyReport.fatality.affirmedBy = null; casualtyReport.fatality.affirmedAt = null; }
+    casAddFormOpen[type] = false;
+    casSearchState[type] = { q: '', role: '' };
+    clearSectionConfirmation('casualties');
+    renderCasualtiesSection();
+  }
+  function onCasSearch(type, val) {
+    casSearchState[type].q = val;
+    renderCasualtiesSection();
+    const el = document.querySelector(`#cas-toolbar-${type} .pt-search input`);
+    if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+  }
+  function clearCasSearch(type) { casSearchState[type].q = ''; renderCasualtiesSection(); }
+  function onCasualtyRoleFilter(type, val) {
+    casSearchState[type].role = val;
+    renderCasualtiesSection();
+  }
+
+  function startCasEdit(type, i) {
+    Object.keys(casEditRowOpen).forEach(k => delete casEditRowOpen[k]);
+    casEditRowOpen[type + '-' + i] = true;
+    renderCasualtiesSection();
+  }
+  function cancelCasEdit(type, i) { delete casEditRowOpen[type + '-' + i]; renderCasualtiesSection(); }
+  function saveCasEdit(type, i) {
+    const row = casualtyReport[type].rows[i];
+    if (!row) return;
+    const noteEl = document.getElementById(`cas-edit-note-${type}-${i}`);
+    row.note = noteEl ? noteEl.value.trim() : row.note;
+    if (row.manual) {
+      const nameEl = document.getElementById(`cas-edit-name-${type}-${i}`);
+      const roleEl = document.getElementById(`cas-edit-role-${type}-${i}`);
+      const name = nameEl ? nameEl.value.trim() : row.name;
+      if (!name) return;
+      row.name = name;
+      row.role = roleEl ? roleEl.value : row.role;
+    }
+    delete casEditRowOpen[type + '-' + i];
+    clearSectionConfirmation('casualties');
+    renderCasualtiesSection();
+  }
+
+  function startCasRemove(type, i) {
+    const row = casualtyReport[type].rows[i];
+    if (!row) return;
+    casRemoveTarget = { type, index: i };
+    document.getElementById('cas-remove-modal-body').innerHTML =
+      `Remove <b>${escapeHtml(row.name)}</b> from <b>${escapeHtml(CAS_TITLES[type])}</b>? This changes the recorded casualty data on a report that may be used as an official record. The entry stays visible, marked as removed with your reason.`;
+    const reasonEl = document.getElementById('cas-remove-reason');
+    reasonEl.value = '';
+    updateCasRemoveConfirmState();
+    document.getElementById('cas-remove-overlay').classList.add('open');
+    setTimeout(() => reasonEl.focus(), 50);
+  }
+  function updateCasRemoveConfirmState() {
+    const btn = document.getElementById('cas-remove-confirm');
+    const el = document.getElementById('cas-remove-reason');
+    if (btn) btn.disabled = !(el && el.value.trim());
+  }
+  function cancelCasRemoveModal() {
+    casRemoveTarget = null;
+    document.getElementById('cas-remove-overlay').classList.remove('open');
+  }
+  function closeCasRemoveModalOnOverlay(e) {
+    if (e.target.id === 'cas-remove-overlay') cancelCasRemoveModal();
+  }
+  function confirmCasRemoveModal() {
+    const reason = document.getElementById('cas-remove-reason').value.trim();
+    if (!reason || !casRemoveTarget) return;
+    const { type, index } = casRemoveTarget;
+    const row = casualtyReport[type].rows[index];
+    if (row) { row.removed = true; row.removalReason = reason; }
+    document.getElementById('cas-remove-overlay').classList.remove('open');
+    casRemoveTarget = null;
+    clearSectionConfirmation('casualties');
+    renderCasualtiesSection();
+  }
+  function undoCasRemove(type, i) {
+    // i indexes the full (unfiltered) row list — matches how the render loop below builds it.
+    const row = casualtyReport[type].rows[i];
+    if (!row) return;
+    row.removed = false;
+    row.removalReason = '';
+    clearSectionConfirmation('casualties');
+    renderCasualtiesSection();
+  }
+
+  function affirmZeroFatalities() {
+    casualtyReport.fatality.affirmedZero = true;
+    casualtyReport.fatality.affirmedBy = currentMemberName();
+    casualtyReport.fatality.affirmedAt = nowStamp();
+    clearSectionConfirmation('casualties');
+    renderCasualtiesSection();
+  }
+  function undoAffirmZeroFatalities() {
+    casualtyReport.fatality.affirmedZero = false;
+    casualtyReport.fatality.affirmedBy = null;
+    casualtyReport.fatality.affirmedAt = null;
+    clearSectionConfirmation('casualties');
+    renderCasualtiesSection();
+  }
+
+  // ── Fatalities: confirm-zero (above) / report-nonzero flow (below). No named-row add-person
+  // path here — this replaces it entirely for the Fatalities category only. ──
+  function toggleFatalityReportForm() {
+    fatalityReportFormOpen = !fatalityReportFormOpen;
+    renderCasualtiesSection();
+    if (fatalityReportFormOpen) { const el = document.getElementById('fatality-report-count'); if (el) el.focus(); }
+  }
+  function cancelFatalityReportForm() { fatalityReportFormOpen = false; renderCasualtiesSection(); }
+  function onFatalityReportInput() {
+    const countEl = document.getElementById('fatality-report-count');
+    const detailsEl = document.getElementById('fatality-report-details');
+    const btn = document.getElementById('fatality-report-save-btn');
+    const countOk = countEl && countEl.value !== '' && Number(countEl.value) >= 0;
+    const detailsOk = detailsEl && detailsEl.value.trim().length > 0;
+    if (btn) btn.disabled = !(countOk && detailsOk);
+  }
+  function saveFatalityReport() {
+    const countEl = document.getElementById('fatality-report-count');
+    const detailsEl = document.getElementById('fatality-report-details');
+    if (!countEl || !detailsEl) return;
+    const count = Number(countEl.value);
+    const details = detailsEl.value.trim();
+    if (!(count >= 0) || !details) return;
+    casualtyReport.fatality = {
+      rows: [], affirmedZero: false, affirmedBy: null, affirmedAt: null,
+      count, details, reportedBy: currentMemberName(), reportedAt: nowStamp(),
+    };
+    fatalityReportFormOpen = false;
+    fatalityReportEditing = false;
+    clearSectionConfirmation('casualties');
+    renderCasualtiesSection();
+  }
+  function startFatalityReportEdit() { fatalityReportEditing = true; renderCasualtiesSection(); }
+  function cancelFatalityReportEdit() { fatalityReportEditing = false; renderCasualtiesSection(); }
+  function undoFatalityReport() {
+    casualtyReport.fatality = { rows: [], affirmedZero: false, affirmedBy: null, affirmedAt: null, count: null, details: '', reportedBy: null, reportedAt: null };
+    fatalityReportEditing = false;
+    clearSectionConfirmation('casualties');
+    renderCasualtiesSection();
+  }
+
+  function renderCasualtiesSection() {
+    const host = document.getElementById('casualties-body');
+    if (!host) return;
+    checkFormValid();
+    updateSaveEditValid();
+    const tabs = `<div class="tab-group">${CAS_TYPES.map(t => {
+      const label = t === 'fatality' ? CAS_TITLES[t] : `${CAS_TITLES[t]} (${casActiveRows(t).length})`;
+      return `<button class="tab-btn ${casActiveTab === t ? 'active' : ''}" onclick="setCasTab('${t}')">${escapeHtml(label)}</button>`;
+    }).join('')}</div>`;
+    host.innerHTML = tabs + renderCasualtyTableHtml(casActiveTab);
+  }
+
+  function renderFatalityPanelHtml() {
+    if (currentRole !== 'TOC Commander Assistant') {
+      return `<div class="casualty-list-panel"><div class="cas-empty-state">
+          <p class="cas-empty-copy">Fatality reporting is the responsibility of TOC Commander Assistant.</p>
+        </div></div>`;
+    }
+    const editing = !formLocked || editModeActive;
+    const f = casualtyReport.fatality;
+
+    if (f.affirmedZero) {
+      const attribution = `Confirmed by ${escapeHtml(f.affirmedBy || '')}${f.affirmedAt ? ' · ' + escapeHtml(f.affirmedAt) : ''}`;
+      const undoBtn = editing ? `<div class="cas-empty-actions" style="margin-top:8px;"><button class="cas-empty-secondary" onclick="undoAffirmZeroFatalities()">Undo</button></div>` : '';
+      return `<div class="casualty-list-panel"><div class="cas-empty-state">
+          <div class="cas-affirmed-note"><i class="ti ti-circle-check" style="color:var(--accent);"></i> Confirmed: no fatalities were recorded in this incident.</div>
+          <p class="cas-empty-attr">${attribution}</p>
+          ${undoBtn}
+        </div></div>`;
+    }
+
+    const hasReport = f.count != null && f.count > 0 && f.details;
+
+    if (editing && (fatalityReportFormOpen || (hasReport && fatalityReportEditing))) {
+      const countVal = hasReport ? f.count : '';
+      const detailsVal = hasReport ? escapeHtml(f.details) : '';
+      const cancelFn = hasReport ? 'cancelFatalityReportEdit' : 'cancelFatalityReportForm';
+      return `<div class="casualty-list-panel"><div class="cas-add-form" style="border-top:none;">
+          <div class="cas-add-fields">
+            <div class="cas-field">
+              <label class="cas-field-label">Fatality count <span class="req">*</span></label>
+              <input class="cas-add-input" type="number" min="0" id="fatality-report-count" value="${countVal}" placeholder="0" oninput="onFatalityReportInput()" />
+            </div>
+          </div>
+          <div class="cas-add-fields" style="margin-top:10px;">
+            <div class="cas-field" style="flex:1;">
+              <label class="cas-field-label">Details <span class="req">*</span></label>
+              <textarea class="cas-add-input" id="fatality-report-details" style="width:100%;min-height:70px;resize:vertical;" placeholder="Names, circumstances, and any other relevant details" oninput="onFatalityReportInput()">${detailsVal}</textarea>
+            </div>
+          </div>
+          <div class="cas-add-actions">
+            <button class="cas-add-btn" id="fatality-report-save-btn" onclick="saveFatalityReport()" ${hasReport ? '' : 'disabled'}>Save</button>
+            <button class="cas-empty-secondary" onclick="${cancelFn}()">Cancel</button>
+          </div>
+        </div></div>`;
+    }
+
+    if (hasReport) {
+      const attribution = `Reported by ${escapeHtml(f.reportedBy || '')}${f.reportedAt ? ' · ' + escapeHtml(f.reportedAt) : ''}`;
+      const actions = editing ? `<div class="cas-empty-actions" style="margin-top:8px;"><button class="cas-empty-secondary" onclick="startFatalityReportEdit()">Edit</button><button class="cas-empty-secondary" onclick="undoFatalityReport()">Undo</button></div>` : '';
+      return `<div class="casualty-list-panel"><div class="cas-empty-state" style="align-items:flex-start;text-align:left;">
+          <div class="cas-affirmed-note"><i class="ti ti-alert-circle" style="color:var(--accent-strong);"></i> ${f.count} ${f.count === 1 ? 'fatality' : 'fatalities'} reported.</div>
+          <p style="font-size:13px;color:var(--text-primary);white-space:pre-wrap;line-height:1.5;">${escapeHtml(f.details)}</p>
+          <p class="cas-empty-attr">${attribution}</p>
+          ${actions}
+        </div></div>`;
+    }
+
+    return `<div class="casualty-list-panel"><div class="cas-empty-state">
+        <p class="cas-empty-copy">Fatalities must be confirmed or reported for this incident.</p>
+        <div class="cas-empty-actions">
+          ${editing ? `<button class="btn-secondary" onclick="affirmZeroFatalities()">Confirm 0 fatalities</button><button class="btn-secondary" onclick="toggleFatalityReportForm()">Report fatalities</button>` : ''}
+        </div>
+      </div></div>`;
+  }
+
+  function renderCasualtyTableHtml(type) {
+    if (type === 'fatality') return renderFatalityPanelHtml();
+
+    const editing = !formLocked || editModeActive;
+    const rows = casualtyReport[type].rows;
+    const searchState = casSearchState[type];
+
+    const headerAddBtn = (editing && rows.length > 0)
+      ? `<button class="cas-add-toggle" onclick="toggleCasAddForm('${type}')"><i class="ti ti-plus"></i> Add person</button>`
+      : '';
+    const header = `
+      <div class="cas-row2 cas-head">
+        <span class="cas-c-name">Name</span>
+        <span class="cas-c-role">Role</span>
+        <span class="cas-c-rec">Recorded</span>
+        <span class="cas-c-note" style="width:300px;">Note</span>
+        ${editing ? `<span class="cas-c-actions">${headerAddBtn}</span>` : ''}
+      </div>`;
+
+    let toolbar = '';
+    if (rows.length > 0) {
+      const q = searchState.q.trim().toLowerCase();
+      const role = searchState.role;
+      const active = q !== '' || role !== '';
+      const matchCount = rows.filter(p => (!role || p.role === role) && (!q || p.name.toLowerCase().includes(q))).length;
+      const roleOpts = ROLE_OPTIONS.map(r => `<option value="${r}" ${role === r ? 'selected' : ''}>${r}</option>`).join('');
+      toolbar = `
+        <div class="pt-toolbar" id="cas-toolbar-${type}" style="margin-top:10px;margin-bottom:10px;">
+          <span class="pt-count">${active ? matchCount + ' found' : ''}</span>
+          <div class="pt-controls">
+            <div class="pt-search">
+              <i class="ti ti-search"></i>
+              <input type="text" placeholder="Search by name" value="${escapeHtml(searchState.q)}" oninput="onCasSearch('${type}', this.value)" />
+            </div>
+            <select class="pt-role-select" onchange="onCasualtyRoleFilter('${type}', this.value)">
+              <option value="" ${role === '' ? 'selected' : ''}>All roles</option>
+              ${roleOpts}
+            </select>
+          </div>
+        </div>`;
+    }
+
+    const q = searchState.q.trim().toLowerCase();
+    const role = searchState.role;
+    const filtered = rows.map((p, i) => ({ p, i })).filter(({ p }) => (!role || p.role === role) && (!q || p.name.toLowerCase().includes(q)));
+
+    let body = filtered.map(({ p, i }) => {
+      if (p.removed) {
+        return `
+          <div class="cas-row2 removed">
+            <span class="cas-c-name">${escapeHtml(p.name)}</span>
+            <span class="cas-c-role">${escapeHtml(p.role)}</span>
+            <span class="cas-c-rec">${p.recordedAt || '—'}</span>
+            <span class="cas-c-note" style="width:300px;"><span class="row-marker removed-tag">Removed</span> <span class="cas-removal-reason">${escapeHtml(p.removalReason)}</span></span>
+            ${editing ? `<span class="cas-c-actions"><button class="drone-reached-btn link" onclick="undoCasRemove('${type}', ${i})">Undo</button></span>` : ''}
+          </div>`;
+      }
+
+      const rec = p.manual ? `<span class="row-marker manual">Manual</span>` : (p.recordedAt || '—');
+      const editKey = type + '-' + i;
+      const noteKey = editKey;
+      const open = !!casNoteOpen[noteKey];
+      const noteTxt = p.note ? escapeHtml(p.note) : '<span style="color:var(--text-tertiary);">—</span>';
+      const noteCell = `<span class="cas-c-note ${open ? 'open' : ''}" style="width:300px;" onclick="toggleCasNote('${type}', ${i})" title="${open ? 'Click to collapse' : 'Click to expand'}">${noteTxt}</span>`;
+
+      if (editing && casEditRowOpen[editKey]) {
+        const disabledAttr = p.manual ? '' : 'disabled';
+        const roleOpts = ROLE_OPTIONS.map(r => `<option value="${r}" ${r === p.role ? 'selected' : ''}>${r}</option>`).join('');
+        return `
+          <div class="cas-add-form">
+            <div class="cas-add-fields">
+              <div class="cas-field">
+                <label class="cas-field-label">Name ${p.manual ? '<span class="req">*</span>' : ''}</label>
+                <input class="cas-add-input" id="cas-edit-name-${type}-${i}" value="${escapeHtml(p.name)}" ${disabledAttr} />
+              </div>
+              <div class="cas-field">
+                <label class="cas-field-label">Role ${p.manual ? '<span class="req">*</span>' : ''}</label>
+                <select class="cas-add-select" id="cas-edit-role-${type}-${i}" ${disabledAttr}>${roleOpts}</select>
+              </div>
+              <div class="cas-field">
+                <label class="cas-field-label">Note</label>
+                <input class="cas-add-input" id="cas-edit-note-${type}-${i}" value="${p.note ? escapeHtml(p.note) : ''}" />
+              </div>
+            </div>
+            <div class="cas-add-actions">
+              <button class="cas-add-btn" onclick="saveCasEdit('${type}', ${i})">Save</button>
+              <button class="cas-empty-secondary" onclick="cancelCasEdit('${type}', ${i})">Cancel</button>
+            </div>
+          </div>`;
+      }
+
+      let actions = '';
+      if (editing) {
+        actions = `<span class="cas-c-actions">
+             <button class="cas-remove-btn cas-trash" onclick="startCasEdit('${type}', ${i})" title="Edit"><i class="ti ti-pencil"></i></button>
+             <button class="cas-remove-btn cas-trash" onclick="startCasRemove('${type}', ${i})" title="Delete"><i class="ti ti-trash"></i></button>
+           </span>`;
+      }
+
+      return `
+        <div class="cas-row2">
+          <span class="cas-c-name">${escapeHtml(p.name)}</span>
+          <span class="cas-c-role">${escapeHtml(p.role)}</span>
+          <span class="cas-c-rec">${rec}</span>
+          ${noteCell}
+          ${actions}
+        </div>`;
+    }).join('');
+
+    if (rows.length > 0 && filtered.length === 0) {
+      body = `<div class="pt-empty">No results match your search.<button class="cas-empty-secondary" onclick="clearCasSearch('${type}')">Clear search</button></div>`;
+    }
+
+    let emptyBlock = '';
+    if (editing && rows.length === 0 && !casAddFormOpen[type]) {
+      const copy = type === 'minor' ? 'No minor injuries recorded yet.' : 'No life-threatening injuries recorded yet.';
+      emptyBlock = `<div class="cas-empty-state">
+             <p class="cas-empty-copy">${copy}</p>
+             <div class="cas-empty-actions"><button class="cas-empty-secondary" onclick="toggleCasAddForm('${type}')">Add person</button></div>
+           </div>`;
+    }
+
+    let addForm = '';
+    if (editing && casAddFormOpen[type]) {
+      const opts = ROLE_OPTIONS.map(r => `<option value="${r}">${r}</option>`).join('');
+      addForm = `
+        <div class="cas-add-form">
+          <div class="cas-add-fields">
+            <div class="cas-field">
+              <label class="cas-field-label">Name <span class="req">*</span></label>
+              <input class="cas-add-input" id="cas-add-name-${type}" placeholder="Full name" oninput="onCasAddInput('${type}')" />
+            </div>
+            <div class="cas-field">
+              <label class="cas-field-label">Role <span class="req">*</span></label>
+              <select class="cas-add-select" id="cas-add-role-${type}" onchange="onCasAddInput('${type}')">
+                <option value="" disabled selected>Select role…</option>
+                ${opts}
+              </select>
+            </div>
+            <div class="cas-field">
+              <label class="cas-field-label">Note</label>
+              <input class="cas-add-input" id="cas-add-note-${type}" placeholder="Note" />
+            </div>
+          </div>
+          <div class="cas-add-actions">
+            <button class="cas-add-btn" id="cas-add-btn-${type}" onclick="addCasualtyRow('${type}')" disabled>Add person</button>
+            <button class="cas-empty-secondary" onclick="cancelCasAddForm('${type}')">Cancel</button>
+          </div>
+        </div>`;
+    }
+
+    return `<div class="casualty-list-panel" style="overflow-x:auto;">${toolbar}${header}${body}${emptyBlock}${addForm}</div>`;
+  }
+  function toggleCasNote(type, i) { casNoteOpen[type + '-' + i] = !casNoteOpen[type + '-' + i]; renderCasualtiesSection(); }
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  MEDICAL: MEDICAL CHANNEL — read-only reference view. Same underlying
+  //  numbers and events as the PIA Admin Panel's Communication → Medical
+  //  channel dashboard for INC-1042, without the chart/drill-downs/Event
+  //  Log plumbing this standalone supplemental report form doesn't have.
+  // ══════════════════════════════════════════════════════════════════════
+  const MEDICAL_CHANNEL_METRICS = [
+    { num: 4, label: 'Total participants' },
+    { num: 3, label: 'Video call peak concurrent' },
+    { num: 3, label: 'Text chat participants' },
+    { num: 1, label: 'Force-mute events' },
+    { num: 1, label: 'Camera on/off events' },
+    { num: 1, label: 'Microphone on/off events' },
+    { num: 4, label: 'Users sent to Medical channel' },
+  ];
+  const MEDICAL_CHANNEL_EVENTS = [
+    { time: '01:13:49 PM', text: '<b>Tom Garfield</b> was added to the Medical channel' },
+    { time: '01:16:11 PM', text: '<b>Anna Brennan</b> was added to the Medical channel' },
+    { time: '01:24:30 PM', text: '<b>Tom Garfield</b> was returned from the Medical channel' },
+    { time: '01:30:30 PM', text: '<b>Kevin Park</b> was added to the Medical channel' },
+    { time: '01:31:20 PM', text: '<b>Priya Nair</b> was added to the Medical channel' },
+    { time: '01:31:40 PM', text: 'TOC Operator <b>Maria Lopez</b> force-muted the Medical channel' },
+    { time: '01:45:00 PM', text: '<b>Kevin Park</b> was returned from the Medical channel' },
+    { time: '01:48:30 PM', text: '<b>Priya Nair</b> was returned from the Medical channel' },
+  ];
+  // ── Communication: per-channel headcount chart (Chart.js port). Each channel's own
+  // *_CHANNEL_EVENTS array is parsed for join/leave text markers into a running headcount
+  // series — Coordination/Verification use "joined"/"left" wording, Medical uses
+  // "was added to"/"was returned from" wording. ──
+  function computeChannelTimeline(events) {
+    let running = 0;
+    const labels = [];
+    const series = [];
+    events.forEach(e => {
+      const text = e.text || '';
+      let delta = 0;
+      if (text.includes('joined') || text.includes('was added to')) delta = 1;
+      else if (text.includes('left') || text.includes('was returned from')) delta = -1;
+      else return; // non join/leave events (e.g. force-mute) don't move the headcount
+      running = Math.max(0, running + delta);
+      labels.push(e.time);
+      series.push(running);
+    });
+    return { labels, series };
+  }
+  const CHANNEL_EVENTS_BY_TYPE = { coordination: null, medical: null, verification: null }; // filled in below, after each *_CHANNEL_EVENTS array is declared
+  let channelChartInstances = {};
+  function renderChannelChart(channel) {
+    const canvas = document.getElementById('channel-chart-' + channel);
+    if (!canvas || typeof Chart === 'undefined') return;
+    const events = CHANNEL_EVENTS_BY_TYPE[channel] || [];
+    const { labels, series } = computeChannelTimeline(events);
+    if (channelChartInstances[channel]) { channelChartInstances[channel].destroy(); channelChartInstances[channel] = null; }
+    if (labels.length === 0) return;
+    channelChartInstances[channel] = new Chart(canvas, {
+      type: 'line',
+      data: { labels, datasets: [{
+        label: 'Participants', data: series,
+        borderColor: '#3b6ef5', backgroundColor: 'rgba(59,110,245,0.10)',
+        borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 4, tension: 0.3, fill: true,
+      }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: item => `${item.parsed.y} member${item.parsed.y === 1 ? '' : 's'}` } },
+        },
+        scales: {
+          x: { ticks: { autoSkip: true, maxTicksLimit: 8, maxRotation: 0 } },
+          y: { beginAtZero: true, ticks: { precision: 0 } },
+        },
+      },
+    });
+  }
+  function channelChartHtml(channel) {
+    return `<div style="position:relative;width:100%;height:200px;margin:14px 0;"><canvas id="channel-chart-${channel}"></canvas></div>`;
+  }
+
+  function renderMedicalChannelSection() {
+    const host = document.getElementById('medical-channel-body');
+    if (!host) return;
+    CHANNEL_EVENTS_BY_TYPE.medical = MEDICAL_CHANNEL_EVENTS;
+    const metrics = `<div class="med-metric-grid">${MEDICAL_CHANNEL_METRICS.map(m => `
+        <div class="med-metric-card">
+          <span class="med-metric-num">${m.num}</span>
+          <span class="med-metric-label">${escapeHtml(m.label)}</span>
+        </div>`).join('')}</div>`;
+    const chart = channelChartHtml('medical');
+    const events = `<div class="med-event-list-title">Channel activity</div>
+      <div class="med-event-list">${MEDICAL_CHANNEL_EVENTS.map(e => `
+        <div class="med-event-row">
+          <span class="med-event-time">${e.time}</span>
+          <span class="med-event-text">${e.text}</span>
+        </div>`).join('')}</div>`;
+    host.innerHTML = metrics + chart + events;
+    if (commsActiveTab === 'medical') renderChannelChart('medical');
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  LE LNO: COORDINATION CHANNEL — read-only reference view, same pattern
+  //  as Medical channel. Verification/Coordination don't have the same
+  //  granular camera/mic/text-chat telemetry Medical channel has in the PIA
+  //  panel, so these two show Total participants / Peak concurrent /
+  //  Force-mute events only — real numbers, not padded out with fields we
+  //  can't back with actual data.
+  // ══════════════════════════════════════════════════════════════════════
+  const COORDINATION_CHANNEL_METRICS = [
+    { num: 20, label: 'Total participants' },
+    { num: 20, label: 'Peak concurrent' },
+    { num: 1, label: 'Force-mute events' },
+  ];
+  const COORDINATION_CHANNEL_EVENTS = [
+    { time: '01:09:30 PM', text: 'Law Enforcement LNO <b>Sophia Turner</b> joined the Coordination channel' },
+    { time: '01:09:45 PM', text: 'Officer <b>Joel Ferreira</b> joined the Coordination channel' },
+    { time: '01:10:15 PM', text: 'Officer <b>Marcus Webb</b> joined the Coordination channel' },
+    { time: '01:10:30 PM', text: 'Officer <b>Isla Jones</b> joined the Coordination channel' },
+    { time: '01:11:00 PM', text: 'Officer <b>Linda Cho</b> joined the Coordination channel' },
+    { time: '01:11:30 PM', text: 'Officer <b>Jake King</b> joined the Coordination channel' },
+    { time: '01:12:15 PM', text: 'Officer <b>Paul Ross</b> joined the Coordination channel' },
+    { time: '01:12:50 PM', text: 'Officer <b>Carl Cruz</b> joined the Coordination channel' },
+    { time: '01:13:20 PM', text: 'Officer <b>Dawn Dixon</b> joined the Coordination channel' },
+    { time: '01:13:50 PM', text: 'Officer <b>Jade Jensen</b> joined the Coordination channel' },
+    { time: '01:14:10 PM', text: 'Officer <b>Sue Shaw</b> joined the Coordination channel' },
+    { time: '01:14:30 PM', text: 'Officer <b>Dana Reyes</b> joined the Coordination channel' },
+    { time: '01:14:50 PM', text: 'Officer <b>Todd Tran</b> joined the Coordination channel' },
+    { time: '01:15:10 PM', text: 'Officer <b>Casey Chen</b> joined the Coordination channel' },
+    { time: '01:15:30 PM', text: 'Officer <b>Lane Lowe</b> joined the Coordination channel' },
+    { time: '01:15:50 PM', text: 'Officer <b>Morgan Moon</b> joined the Coordination channel' },
+    { time: '01:16:10 PM', text: 'Officer <b>Vega Vera</b> joined the Coordination channel' },
+    { time: '01:16:30 PM', text: 'Officer <b>Ada Cruz</b> joined the Coordination channel' },
+    { time: '01:16:50 PM', text: 'Officer <b>Rex Fox</b> joined the Coordination channel' },
+    { time: '01:17:10 PM', text: 'Officer <b>Marcus Cho</b> joined the Coordination channel' },
+    { time: '01:34:27 PM', text: 'TOC Operator <b>James Cole</b> force-muted the Coordination channel' },
+    { time: '01:55:00 PM', text: 'Officer <b>Joel Ferreira</b> left the Coordination channel' },
+    { time: '01:57:30 PM', text: 'Officer <b>Isla Jones</b> left the Coordination channel' },
+    { time: '02:00:30 PM', text: 'Officer <b>Jake King</b> left the Coordination channel' },
+    { time: '02:02:15 PM', text: 'Officer <b>Paul Ross</b> left the Coordination channel' },
+    { time: '02:04:40 PM', text: 'Officer <b>Carl Cruz</b> left the Coordination channel' },
+    { time: '02:05:00 PM', text: 'Officer <b>Marcus Webb</b> left the Coordination channel' },
+    { time: '02:06:20 PM', text: 'Officer <b>Dawn Dixon</b> left the Coordination channel' },
+    { time: '02:08:00 PM', text: 'Officer <b>Linda Cho</b> left the Coordination channel' },
+    { time: '02:09:10 PM', text: 'Officer <b>Jade Jensen</b> left the Coordination channel' },
+    { time: '02:12:00 PM', text: 'Officer <b>Sue Shaw</b> left the Coordination channel' },
+    { time: '02:13:00 PM', text: 'Officer <b>Dana Reyes</b> left the Coordination channel' },
+    { time: '02:13:45 PM', text: 'Officer <b>Todd Tran</b> left the Coordination channel' },
+    { time: '02:14:30 PM', text: 'Officer <b>Casey Chen</b> left the Coordination channel' },
+    { time: '02:15:00 PM', text: 'Law Enforcement LNO <b>Sophia Turner</b> left the Coordination channel' },
+    { time: '02:15:15 PM', text: 'Officer <b>Lane Lowe</b> left the Coordination channel' },
+    { time: '02:16:00 PM', text: 'Officer <b>Morgan Moon</b> left the Coordination channel' },
+    { time: '02:16:45 PM', text: 'Officer <b>Vega Vera</b> left the Coordination channel' },
+    { time: '02:17:30 PM', text: 'Officer <b>Ada Cruz</b> left the Coordination channel' },
+    { time: '02:18:15 PM', text: 'Officer <b>Rex Fox</b> left the Coordination channel' },
+    { time: '02:19:00 PM', text: 'Officer <b>Marcus Cho</b> left the Coordination channel' },
+  ];
+  function renderCoordinationChannelSection() {
+    const host = document.getElementById('coordination-channel-body');
+    if (!host) return;
+    CHANNEL_EVENTS_BY_TYPE.coordination = COORDINATION_CHANNEL_EVENTS;
+    const metrics = `<div class="med-metric-grid">${COORDINATION_CHANNEL_METRICS.map(m => `
+        <div class="med-metric-card">
+          <span class="med-metric-num">${m.num}</span>
+          <span class="med-metric-label">${escapeHtml(m.label)}</span>
+        </div>`).join('')}</div>`;
+    const chart = channelChartHtml('coordination');
+    const events = `<div class="med-event-list-title">Channel activity</div>
+      <div class="med-event-list">${COORDINATION_CHANNEL_EVENTS.map(e => `
+        <div class="med-event-row">
+          <span class="med-event-time">${e.time}</span>
+          <span class="med-event-text">${e.text}</span>
+        </div>`).join('')}</div>`;
+    host.innerHTML = metrics + chart + events;
+    if (commsActiveTab === 'coordination') renderChannelChart('coordination');
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  SCHOOL STAFF LNO: VERIFICATION CHANNEL — same pattern as Coordination
+  //  channel above.
+  // ══════════════════════════════════════════════════════════════════════
+  const VERIFICATION_CHANNEL_METRICS = [
+    { num: 18, label: 'Total participants' },
+    { num: 14, label: 'Peak concurrent' },
+    { num: 1, label: 'Force-mute events' },
+  ];
+  const VERIFICATION_CHANNEL_EVENTS = [
+    { time: '01:05:10 PM', text: '<b>Brian Hassan</b> joined the Verification channel' },
+    { time: '01:05:20 PM', text: 'School Staff LNO <b>Nathan Brooks</b> joined the Verification channel' },
+    { time: '01:05:25 PM', text: '<b>Carla Diaz</b> joined the Verification channel' },
+    { time: '01:05:35 PM', text: 'TOC Commander <b>Rachel Stone</b> joined the Verification channel' },
+    { time: '01:05:50 PM', text: 'TOC Commander Assistant <b>Marcus Reed</b> joined the Verification channel' },
+    { time: '01:07:25 PM', text: '<b>Olivia Patel</b> joined the Verification channel' },
+    { time: '01:07:40 PM', text: '<b>Rosa Scott</b> joined the Verification channel' },
+    { time: '01:07:55 PM', text: '<b>Sam Torres</b> joined the Verification channel' },
+    { time: '01:08:10 PM', text: '<b>Tina Upton</b> joined the Verification channel' },
+    { time: '01:08:25 PM', text: '<b>Vince Walsh</b> joined the Verification channel' },
+    { time: '01:08:40 PM', text: '<b>Wendy Young</b> joined the Verification channel' },
+    { time: '01:10:00 PM', text: 'TOC Commander Assistant <b>Marcus Reed</b> left the Verification channel' },
+    { time: '01:10:30 PM', text: '<b>Brian Hassan</b> left the Verification channel' },
+    { time: '01:10:40 PM', text: '<b>Mike Marsh</b> joined the Verification channel' },
+    { time: '01:10:55 PM', text: '<b>Nina Neal</b> joined the Verification channel' },
+    { time: '01:11:10 PM', text: '<b>Omar Orr</b> joined the Verification channel' },
+    { time: '01:11:15 PM', text: '<b>Carla Diaz</b> left the Verification channel' },
+    { time: '01:11:25 PM', text: '<b>Pam Price</b> joined the Verification channel' },
+    { time: '01:11:40 PM', text: '<b>Reid Reed</b> joined the Verification channel' },
+    { time: '01:11:55 PM', text: '<b>Val Vance</b> joined the Verification channel' },
+    { time: '01:12:00 PM', text: 'TOC Commander <b>Rachel Stone</b> left the Verification channel' },
+    { time: '01:12:10 PM', text: '<b>Yuki Yee</b> joined the Verification channel' },
+    { time: '01:17:30 PM', text: 'TOC Operator <b>James Cole</b> force-muted the Verification channel' },
+    { time: '01:19:50 PM', text: '<b>Olivia Patel</b> left the Verification channel' },
+    { time: '01:20:00 PM', text: 'School Staff LNO <b>Nathan Brooks</b> left the Verification channel' },
+    { time: '01:20:55 PM', text: '<b>Rosa Scott</b> left the Verification channel' },
+    { time: '01:22:00 PM', text: '<b>Sam Torres</b> left the Verification channel' },
+    { time: '01:23:00 PM', text: '<b>Tina Upton</b> left the Verification channel' },
+    { time: '01:23:40 PM', text: '<b>Vince Walsh</b> left the Verification channel' },
+    { time: '01:24:20 PM', text: '<b>Wendy Young</b> left the Verification channel' },
+    { time: '01:29:40 PM', text: '<b>Mike Marsh</b> left the Verification channel' },
+    { time: '01:30:20 PM', text: '<b>Nina Neal</b> left the Verification channel' },
+    { time: '01:31:00 PM', text: '<b>Omar Orr</b> left the Verification channel' },
+    { time: '01:31:40 PM', text: '<b>Pam Price</b> left the Verification channel' },
+    { time: '01:32:20 PM', text: '<b>Reid Reed</b> left the Verification channel' },
+    { time: '01:33:00 PM', text: '<b>Val Vance</b> left the Verification channel' },
+    { time: '01:33:40 PM', text: '<b>Yuki Yee</b> left the Verification channel' },
+  ];
+  function renderVerificationChannelSection() {
+    const host = document.getElementById('verification-channel-body');
+    if (!host) return;
+    CHANNEL_EVENTS_BY_TYPE.verification = VERIFICATION_CHANNEL_EVENTS;
+    const metrics = `<div class="med-metric-grid">${VERIFICATION_CHANNEL_METRICS.map(m => `
+        <div class="med-metric-card">
+          <span class="med-metric-num">${m.num}</span>
+          <span class="med-metric-label">${escapeHtml(m.label)}</span>
+        </div>`).join('')}</div>`;
+    const chart = channelChartHtml('verification');
+    const events = `<div class="med-event-list-title">Channel activity</div>
+      <div class="med-event-list">${VERIFICATION_CHANNEL_EVENTS.map(e => `
+        <div class="med-event-row">
+          <span class="med-event-time">${e.time}</span>
+          <span class="med-event-text">${e.text}</span>
+        </div>`).join('')}</div>`;
+    host.innerHTML = metrics + chart + events;
+    if (commsActiveTab === 'verification') renderChannelChart('verification');
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  SCHOOL STAFF LNO: MOBILE USERS — read-only reference view, real
+  //  numbers from the PIA Admin Panel's Mobile users card + usage-breakdown
+  //  pies (Staff vs. Law Enforcement app-usage split).
+  // ══════════════════════════════════════════════════════════════════════
+  const MOBILE_USAGE_PIE_COLORS = ['#3b6ef5', '#8aa6ef', '#2f5ad4', '#b9c4d6', '#5b6b8a', '#c9ced8'];
+  const MOBILE_USAGE_DATA = {
+    staff: {
+      label: 'Staff',
+      sub: 'Share of time spent per area in the mobile app',
+      segments: [
+        { label: 'Video call', pct: 42 },
+        { label: 'Call', pct: 28 },
+        { label: 'Home page', pct: 22 },
+        { label: 'Profile settings', pct: 8 },
+      ],
+    },
+    le: {
+      label: 'Law enforcement',
+      sub: 'Share of time spent per area in the mobile app',
+      segments: [
+        { label: 'Text chat', pct: 24 },
+        { label: 'Map', pct: 22 },
+        { label: 'Video call', pct: 20 },
+        { label: 'Shared assets', pct: 18 },
+        { label: 'Home page', pct: 12 },
+        { label: 'Profile settings', pct: 4 },
+      ],
+    },
+  };
+  function mobileUsagePieSvg(segments) {
+    const size = 108, stroke = 22, r = (size - stroke) / 2, c = 2 * Math.PI * r, cx = size / 2, cy = size / 2;
+    let offset = 0;
+    const arcs = segments.map((s, i) => {
+      const len = (s.pct / 100) * c;
+      const arc = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${MOBILE_USAGE_PIE_COLORS[i % MOBILE_USAGE_PIE_COLORS.length]}" stroke-width="${stroke}" stroke-dasharray="${len} ${c - len}" stroke-dashoffset="${-offset}"><title>${s.label} — ${s.pct}%</title></circle>`;
+      offset += len;
+      return arc;
+    }).join('');
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform:rotate(-90deg);flex-shrink:0;">${arcs}</svg>`;
+  }
+  function mobileUsageCardHtml(roleKey) {
+    const d = MOBILE_USAGE_DATA[roleKey];
+    const legend = d.segments.map((s, i) => `
+      <div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:3px 0;">
+        <span style="width:9px;height:9px;border-radius:50%;background:${MOBILE_USAGE_PIE_COLORS[i % MOBILE_USAGE_PIE_COLORS.length]};flex-shrink:0;"></span>
+        <span style="flex:1;color:var(--text-secondary);">${escapeHtml(s.label)}</span>
+        <span style="font-weight:600;color:var(--text-primary);">${s.pct}%</span>
+      </div>`).join('');
+    return `<div style="border:0.5px solid var(--border-light);border-radius:var(--radius-md);padding:14px 16px;flex:1;min-width:240px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text-primary);">${escapeHtml(d.label)}</div>
+        <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:10px;">${escapeHtml(d.sub)}</div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          ${mobileUsagePieSvg(d.segments)}
+          <div style="flex:1;min-width:0;">${legend}</div>
+        </div>
+      </div>`;
+  }
+  let mobileUsageDetailOpen = true;
+  function toggleMobileUsageDetail() {
+    mobileUsageDetailOpen = !mobileUsageDetailOpen;
+    renderMobileUsersSection();
+  }
+  function renderMobileUsersSection() {
+    const host = document.getElementById('mobile-users-body');
+    if (!host) return;
+    const metrics = `<div class="med-metric-grid">
+        <div class="med-metric-card" onclick="toggleMobileUsageDetail()" style="cursor:pointer;">
+          <span class="med-metric-num">62</span>
+          <span class="med-metric-label">Total participants</span>
+        </div>
+        <div class="med-metric-card">
+          <span class="med-metric-num">57</span>
+          <span class="med-metric-label">Peak concurrent</span>
+        </div>
+      </div>`;
+    const detail = mobileUsageDetailOpen
+      ? `<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;">${mobileUsageCardHtml('staff')}${mobileUsageCardHtml('le')}</div>`
+      : `<button class="btn-link" onclick="toggleMobileUsageDetail()" style="margin-top:10px;"><i class="ti ti-chevron-down"></i> Show usage breakdown</button>`;
+    host.innerHTML = metrics + detail;
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  COP MANAGER / THREAT TRACKER: INCIDENT RECAP — real top-line metrics
+  //  and the full 5-stage timing table from the PIA Admin Panel's Incident
+  //  recap section.
+  // ══════════════════════════════════════════════════════════════════════
+  const RECAP_METRICS = [
+    { num: '2h 08m', label: 'Total duration' },
+    { num: '4m 55s', label: 'Alarm to first officer' },
+    { num: '7m 05s', label: 'Alarm to first threat identified' },
+    { num: '—', label: 'Shots fired to first medical intervention' },
+    { num: '1', label: 'Threats' },
+  ];
+  const RECAP_STAGE_COLORS = ['#3b6ef5', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6'];
+  const RECAP_STAGES = [
+    { name: 'Verification', started: '01:04:02 PM', ended: '01:09:14 PM', duration: '5m 12s', changedBy: 'TOC Commander Rachel Stone',
+      threats: [{ time: '01:08:40 PM', text: 'Threat 1 marked on the map by <b>TOC Commander Rachel Stone</b>' }] },
+    { name: 'Response', started: '01:09:14 PM', ended: '03:12:04 PM', duration: '2h 02m 50s', changedBy: 'TOC Operator James Cole', threats: [] },
+    { name: 'Threat neutralization', started: '01:09:14 PM', ended: '01:15:02 PM', duration: '5m 48s', changedBy: 'TOC Operator James Cole',
+      threats: [{ time: '01:14:50 PM', text: 'Threat 1 marked resolved by <b>TOC Operator James Cole</b>' }] },
+    { name: 'Medical', started: '01:13:00 PM', ended: '01:58:00 PM', duration: '45m 00s', changedBy: 'TOC Operator James Cole', threats: [] },
+    { name: 'Reunification', started: '01:33:00 PM', ended: '03:12:04 PM', duration: '1h 39m 04s', changedBy: 'TOC Commander Rachel Stone (resolved)', threats: [] },
+  ];
+  // Parses a duration string like "1h 39m 04s" / "5m 12s" into seconds — used only to size the
+  // stage bar's proportional segments (RECAP_STAGES doesn't carry raw start/end timestamps).
+  function recapDurationToSec(str) {
+    const h = /(\d+)\s*h/.exec(str), m = /(\d+)\s*m/.exec(str), s = /(\d+)\s*s/.exec(str);
+    return (h ? +h[1] * 3600 : 0) + (m ? +m[1] * 60 : 0) + (s ? +s[1] : 0);
+  }
+  function recapStageBarHtml() {
+    const secs = RECAP_STAGES.map(s => recapDurationToSec(s.duration));
+    const total = secs.reduce((a, b) => a + b, 0) || 1;
+    let cursor = 0;
+    const segs = RECAP_STAGES.map((s, i) => {
+      const left = (cursor / total) * 100;
+      const width = (secs[i] / total) * 100;
+      cursor += secs[i];
+      return `<div class="recap-stage-seg" style="left:${left.toFixed(2)}%;width:${width.toFixed(2)}%;background:${RECAP_STAGE_COLORS[i % RECAP_STAGE_COLORS.length]};" title="${escapeHtml(s.name)} — ${s.duration}"></div>`;
+    }).join('');
+    return `<div class="recap-stage-bar">${segs}</div>`;
+  }
+  function recapStageLegendHtml() {
+    return `<div class="recap-stage-legend">${RECAP_STAGES.map((s, i) => `
+      <div class="recap-stage-legend-item"><span class="recap-stage-legend-dot" style="background:${RECAP_STAGE_COLORS[i % RECAP_STAGE_COLORS.length]};"></span><span>${escapeHtml(s.name)} · ${s.duration}</span></div>`).join('')}</div>`;
+  }
+
+  // ── Stage rows expand to a small threats sub-panel (static per-stage data — there's no live
+  // event-log engine in this standalone form to compute it from). ──
+  let recapStageExpandOpen = {};
+  function toggleRecapStageExpand(name) {
+    recapStageExpandOpen[name] = !recapStageExpandOpen[name];
+    renderIncidentRecapSection();
+  }
+  function recapStageTableHtml() {
+    const header = `
+      <div class="cas-row2 cas-head">
+        <span class="toc-c-name">Stage</span>
+        <span class="toc-c-conn">Started</span>
+        <span class="toc-c-left">Ended</span>
+        <span class="dr-c-reached">Duration</span>
+        <span class="recap-c-by">Changed by</span>
+      </div>`;
+    const rows = RECAP_STAGES.map(s => {
+      const open = !!recapStageExpandOpen[s.name];
+      const summary = `
+        <div class="cas-row2" onclick="toggleRecapStageExpand('${s.name}')" style="cursor:pointer;">
+          <span class="toc-c-name"><i class="ti ti-chevron-right casualty-chevron ${open ? 'open' : ''}" style="margin-right:8px;"></i>${escapeHtml(s.name)}</span>
+          <span class="toc-c-conn">${s.started}</span>
+          <span class="toc-c-left">${s.ended}</span>
+          <span class="dr-c-reached">${s.duration}</span>
+          <span class="recap-c-by">${escapeHtml(s.changedBy)}</span>
+        </div>`;
+      const threatsHtml = (s.threats && s.threats.length)
+        ? s.threats.map(t => `<div class="med-event-row"><span class="med-event-time">${t.time}</span><span class="med-event-text">${t.text}</span></div>`).join('')
+        : `<div class="med-event-row"><span class="med-event-text" style="color:var(--text-tertiary);">No threat updates during this stage.</span></div>`;
+      const expand = open ? `<div class="med-event-list" style="margin:0 14px 12px;border-top:none;">${threatsHtml}</div>` : '';
+      return summary + expand;
+    }).join('');
+    return `<div class="casualty-list-panel">${header}${rows}</div>`;
+  }
+
+  // ── Suspect information block: current card + "Show more" history toggle. Static local
+  // data — no live activeLogEvents source in this standalone form. ──
+  const SUSPECT_UPDATES = [
+    { suspectDesc: 'Male, approx. 30s, red hooded jacket, last seen near the east stairwell.', by: 'TOC Commander Rachel Stone', time: '01:07:22 PM' },
+    { suspectDesc: 'Male, approx. 30s, red hooded jacket, believed to be in custody near the east parking lot.', by: 'TOC Operator James Cole', time: '01:16:40 PM' },
+  ];
+  let suspectHistoryOpen = false;
+  function toggleSuspectHistory() {
+    suspectHistoryOpen = !suspectHistoryOpen;
+    renderIncidentRecapSection();
+  }
+  function suspectEntryInner(u, isLatest) {
+    return `<div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start;">
+        <div style="flex:1;min-width:0;">
+          <p class="stats-suspect-text">${escapeHtml(u.suspectDesc)}</p>
+          <p class="stats-suspect-meta">${escapeHtml(u.by)} · ${u.time}</p>
+        </div>
+        ${isLatest ? '<span class="stats-suspect-current-tag" style="flex-shrink:0;">Latest</span>' : ''}
+      </div>`;
+  }
+  function suspectBlockHtml() {
+    if (SUSPECT_UPDATES.length === 0) return '';
+    const latest = SUSPECT_UPDATES[SUSPECT_UPDATES.length - 1];
+    const card = suspectHistoryOpen ? '' : `<div class="stats-suspect-card">${suspectEntryInner(latest, true)}</div>`;
+    const history = suspectHistoryOpen
+      ? `<div class="stats-suspect-history">${SUSPECT_UPDATES.map((u, i) => `<div class="stats-suspect-card">${suspectEntryInner(u, i === SUSPECT_UPDATES.length - 1)}</div>`).join('')}</div>`
+      : '';
+    const toggle = SUSPECT_UPDATES.length > 1
+      ? `<button class="btn-link" onclick="toggleSuspectHistory()" style="margin-top:8px;"><i class="ti ti-chevron-${suspectHistoryOpen ? 'up' : 'down'}"></i> ${suspectHistoryOpen ? 'Show less' : 'Show more'}</button>`
+      : '';
+    return `<div id="suspect-block" style="margin-top:18px;">
+        <div class="med-event-list-title">Suspect information</div>
+        ${card}${history}${toggle}
+      </div>`;
+  }
+
+  function renderIncidentRecapSection() {
+    const host = document.getElementById('recap-body');
+    if (!host) return;
+    const metrics = `<div class="med-metric-grid">${RECAP_METRICS.map(m => `
+        <div class="med-metric-card">
+          <span class="med-metric-num">${m.num}</span>
+          <span class="med-metric-label">${escapeHtml(m.label)}</span>
+        </div>`).join('')}</div>`;
+    host.innerHTML = `${metrics}<div class="med-event-list-title">Stage progression</div>${recapStageBarHtml()}${recapStageLegendHtml()}${recapStageTableHtml()}${suspectBlockHtml()}`;
+  }
+  function renderTimeMaskHtml(prefix, timeStr) {
+    const m = (timeStr || '').match(/(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)/i);
+    const hh = m ? m[1].padStart(2, '0') : '12';
+    const mm = m ? m[2] : '00';
+    const ss = m ? m[3] : '00';
+    const ampm = m ? m[4].toUpperCase() : 'AM';
+    return `
+      <div class="time-mask" id="${prefix}-wrap">
+        <input class="time-seg" id="${prefix}-hh" maxlength="2" inputmode="numeric" autocomplete="off" value="${hh}" onkeydown="handleTimeSegKeydown('${prefix}','hh',event)" onfocus="this.select()">
+        <span class="time-colon">:</span>
+        <input class="time-seg" id="${prefix}-mm" maxlength="2" inputmode="numeric" autocomplete="off" value="${mm}" onkeydown="handleTimeSegKeydown('${prefix}','mm',event)">
+        <span class="time-colon">:</span>
+        <input class="time-seg" id="${prefix}-ss" maxlength="2" inputmode="numeric" autocomplete="off" value="${ss}" onkeydown="handleTimeSegKeydown('${prefix}','ss',event)">
+        <button type="button" class="time-ampm" id="${prefix}-ampm" data-val="${ampm}" onclick="toggleTimeMaskAmpm('${prefix}')">${ampm}</button>
+      </div>`;
+  }
+  function timeSegRange(seg) { return seg === 'hh' ? { min: 1, max: 12 } : { min: 0, max: 59 }; }
+  function handleTimeSegKeydown(prefix, seg, e) {
+    const input = document.getElementById(`${prefix}-${seg}`);
+    const pos = input.selectionStart;
+    const val = input.value.padStart(2, '0');
+    if (/^[0-9]$/.test(e.key)) {
+      e.preventDefault();
+      const idx = Math.min(pos, 1);
+      const arr = val.split('');
+      arr[idx] = e.key;
+      const newVal = arr.join('');
+      const num = parseInt(newVal, 10);
+      const { min, max } = timeSegRange(seg);
+      if (num < min || num > max) return;
+      input.value = newVal;
+      if (idx === 0) {
+        input.setSelectionRange(1, 1);
+      } else {
+        const next = seg === 'hh' ? 'mm' : (seg === 'mm' ? 'ss' : null);
+        if (next) { const el = document.getElementById(prefix + '-' + next); el.focus(); el.select(); }
+      }
+    } else if (e.key === 'Backspace') {
+      e.preventDefault();
+      const idx = Math.max(0, Math.min(pos - 1, 1));
+      const arr = val.split('');
+      arr[idx] = '0';
+      input.value = arr.join('');
+      input.setSelectionRange(idx, idx);
+    } else if (!['ArrowLeft', 'ArrowRight', 'Tab', 'Shift'].includes(e.key)) {
+      e.preventDefault();
+    }
+  }
+  function toggleTimeMaskAmpm(prefix) {
+    const btn = document.getElementById(prefix + '-ampm');
+    const newVal = btn.dataset.val === 'AM' ? 'PM' : 'AM';
+    btn.dataset.val = newVal;
+    btn.textContent = newVal;
+  }
+  function getTimeMaskValue(prefix) {
+    const hh = document.getElementById(prefix + '-hh').value.padStart(2, '0');
+    const mm = document.getElementById(prefix + '-mm').value.padStart(2, '0');
+    const ss = document.getElementById(prefix + '-ss').value.padStart(2, '0');
+    const ampm = document.getElementById(prefix + '-ampm').dataset.val;
+    return `${hh}:${mm}:${ss} ${ampm}`;
+  }
+</script>
+</body>
+</html>
